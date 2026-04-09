@@ -27,6 +27,7 @@ public class CreditCardTransaction extends Payment {
             return false;
         }else {
             setStatus(PaymentStatus.COMPLETED);
+            cardBalance -= getAmount();
             System.out.println("Credit card payment successful.");
             return true;
         }
