@@ -1,4 +1,10 @@
 package parkinglot.payment;
 
-public class PaymentStatus {
+public enum PaymentStatus {
+    UNPAID,
+    PENDING,
+    COMPLETED,
+    DECLINED,
+    CANCELLED,
+    REFUNDED
 }
