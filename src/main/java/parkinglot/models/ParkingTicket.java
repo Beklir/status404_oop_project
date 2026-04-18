@@ -28,9 +28,6 @@ public class ParkingTicket {
         this.spotNumber = spotNumber;
     }
 
-    /**
-     * Returns duration parked in minutes.
-     */
     public long getParkingDurationMinutes() {
         LocalDateTime end = (payedAt != null) ? payedAt : LocalDateTime.now();
         return ChronoUnit.MINUTES.between(issuedAt, end);
@@ -74,11 +71,4 @@ public class ParkingTicket {
     public String getVehicleLicense() { return vehicleLicense; }
     public void setVehicleLicense(String vehicleLicense) { this.vehicleLicense = vehicleLicense; }
 
-    @Override
-    public String toString() {
-        return String.format(
-                "ParkingTicket{number='%s', vehicle='%s', spot='%s', issuedAt=%s, status=%s, duration=%d min}",
-                ticketNumber, vehicleLicense, spotNumber, issuedAt, status, getParkingDurationMinutes()
-        );
-    }
 }

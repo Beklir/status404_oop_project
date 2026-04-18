@@ -18,37 +18,14 @@ public class ParkingFloor {
     public ParkingFloor(String name) {
         this.name = name;
         this.spots = new ArrayList<>();
-        this.displayBoard = new ParkingDisplayBoard("DB-" + name);
-    }
-
-    public void updateDisplayBoard() {
-        long freeHandicapped = spots.stream()
-                .filter(s -> s.getType() == ParkingSpotType.HANDICAPPED && s.isFree()).count();
-        long freeCompact = spots.stream()
-                .filter(s -> s.getType() == ParkingSpotType.COMPACT && s.isFree()).count();
-        long freeLarge = spots.stream()
-                .filter(s -> s.getType() == ParkingSpotType.LARGE && s.isFree()).count();
-        long freeMotorbike = spots.stream()
-                .filter(s -> s.getType() == ParkingSpotType.MOTORBIKE && s.isFree()).count();
-        long freeElectric = spots.stream()
-                .filter(s -> s.getType() == ParkingSpotType.ELECTRIC && s.isFree()).count();
-
-        displayBoard.updateFreeCounts(
-                (int) freeHandicapped, (int) freeCompact,
-                (int) freeLarge, (int) freeMotorbike, (int) freeElectric
-        );
+        this.displayBoard = new ParkingDisplayBoard("DisplayBoard-" + name);
     }
 
     public void addParkingSlot(ParkingSpot spot) {
         spots.add(spot);
-        updateDisplayBoard();
         System.out.println("Spot " + spot.getNumber() + " (" + spot.getType() + ") added to floor " + name);
     }
 
-    /**
-     * Assigns the first suitable free spot to the vehicle.
-     * Returns the assigned spot or null if none available.
-     */
     public ParkingSpot assignVehicleToSlot(Vehicle vehicle) {
         ParkingSpotType required = getRequiredSpotType(vehicle.getType());
 
@@ -64,18 +41,13 @@ public class ParkingFloor {
 
         boolean assigned = spot.assignVehicle(vehicle);
         if (assigned) {
-            updateDisplayBoard();
             return spot;
         }
         return null;
     }
 
-    /**
-     * Frees the spot occupied by a vehicle.
-     */
     public boolean freeSlot(ParkingSpot spot) {
         boolean removed = spot.removeVehicle();
-        if (removed) updateDisplayBoard();
         return removed;
     }
 
@@ -89,15 +61,11 @@ public class ParkingFloor {
         }
     }
 
-    public void showDisplayBoard() {
-        updateDisplayBoard();
-        displayBoard.showEmptySpotNumber();
-    }
-
     public boolean hasAvailableSpot(ParkingSpotType type) {
         return spots.stream().anyMatch(s -> s.getType() == type && s.isFree());
     }
 
+    // Getters and Setters
     public int getTotalSpots() { return spots.size(); }
 
     public long getFreeSpotCount() {
@@ -111,9 +79,4 @@ public class ParkingFloor {
 
     public ParkingDisplayBoard getDisplayBoard() { return displayBoard; }
 
-    @Override
-    public String toString() {
-        return String.format("ParkingFloor{name='%s', totalSpots=%d, freeSpots=%d}",
-                name, getTotalSpots(), getFreeSpotCount());
-    }
 }

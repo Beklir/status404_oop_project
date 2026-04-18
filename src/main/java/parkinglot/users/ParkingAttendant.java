@@ -24,9 +24,6 @@ public class ParkingAttendant extends Account {
         return true;
     }
 
-    /**
-     * Accept cash payment on behalf of a customer.
-     */
     public boolean acceptCashPayment(ParkingTicket ticket, ParkingRate rate, double cashTendered) {
         if (ticket.isPaid()) {
             System.out.println("Ticket " + ticket.getTicketNumber() + " is already paid.");

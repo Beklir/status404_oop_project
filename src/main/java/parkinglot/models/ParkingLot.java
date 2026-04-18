@@ -11,13 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Central entity of the Parking Lot System.
- * Manages floors, panels, tickets, and spot allocation.
- */
 public class ParkingLot {
-    private static ParkingLot instance;   // Singleton — only one lot managed at a time
-
     private String id;
     private String name;
     private Location address;
@@ -31,24 +25,11 @@ public class ParkingLot {
         this.id = id;
         this.name = name;
         this.address = address;
-        this.parkingRate = new ParkingRate("rate-default");
+        this.parkingRate = new ParkingRate();
         this.floors = new ArrayList<>();
         this.entrancePanels = new ArrayList<>();
         this.exitPanels = new ArrayList<>();
         this.activeTickets = new ArrayList<>();
-    }
-
-    /** Singleton accessor */
-    public static ParkingLot getInstance(String id, String name, Location address) {
-        if (instance == null) {
-            instance = new ParkingLot(id, name, address);
-        }
-        return instance;
-    }
-
-    public static ParkingLot getInstance() {
-        if (instance == null) throw new IllegalStateException("ParkingLot not initialized.");
-        return instance;
     }
 
     // ─── Floor management ────────────────────────────────────────────────────
@@ -91,12 +72,6 @@ public class ParkingLot {
 
     // ─── Vehicle entry / exit ────────────────────────────────────────────────
 
-    /**
-     * Processes a vehicle's entry:
-     *   1. Checks capacity
-     *   2. Finds a free spot
-     *   3. Creates and returns a ticket
-     */
     public ParkingTicket vehicleEntry(Vehicle vehicle) {
         if (isFullForType(vehicle.getType())) {
             System.out.println("Parking lot is full for vehicle type: " + vehicle.getType());
@@ -128,7 +103,6 @@ public class ParkingLot {
                 vehicle.getLicenseNumber(), assignedFloor.getName(),
                 assignedSpot.getNumber(), ticket.getTicketNumber());
 
-        updateAllDisplayBoards();
         return ticket;
     }
 
@@ -163,16 +137,11 @@ public class ParkingLot {
 
         activeTickets.remove(ticket);
         vehicle.setTicket(null);
-        updateAllDisplayBoards();
         System.out.println("[EXIT] Vehicle " + vehicle.getLicenseNumber() + " exited. Spot " + spotNumber + " is now free.");
         return true;
     }
 
     // ─── Display ─────────────────────────────────────────────────────────────
-
-    public void updateAllDisplayBoards() {
-        floors.forEach(ParkingFloor::showDisplayBoard);
-    }
 
     public void showStatus() {
         System.out.println("\n========== " + name + " Status ==========");
@@ -222,9 +191,4 @@ public class ParkingLot {
     public List<ExitPanel> getExitPanels() { return exitPanels; }
     public List<ParkingTicket> getActiveTickets() { return activeTickets; }
 
-    @Override
-    public String toString() {
-        return String.format("ParkingLot{name='%s', floors=%d, freeSpots=%d}",
-                name, floors.size(), getTotalFreeSpots());
-    }
 }

@@ -5,9 +5,6 @@ import parkinglot.models.ParkingRate;
 import parkinglot.payment.CashTransaction;
 import parkinglot.payment.CreditCardTransaction;
 
-/**
- * Physical terminal used by parking attendants to scan tickets and process payments.
- */
 public class ParkingAttendantPortal {
     private String id;
 
@@ -27,9 +24,7 @@ public class ParkingAttendantPortal {
         return fee;
     }
 
-    /**
-     * Process cash payment via attendant portal.
-     */
+//    Cash Payment
     public boolean processPayment(ParkingTicket ticket, ParkingRate rate, double cashTendered) {
         if (ticket.isPaid()) {
             System.out.println("[AttendantPortal " + id + "] Ticket already paid.");
@@ -44,29 +39,8 @@ public class ParkingAttendantPortal {
         return success;
     }
 
-    /**
-     * Process credit card payment via attendant portal.
-     */
-    public boolean processPayment(ParkingTicket ticket, ParkingRate rate,
-                                  String nameOnCard, String cardNumber) {
-        if (ticket.isPaid()) {
-            System.out.println("[AttendantPortal " + id + "] Ticket already paid.");
-            return false;
-        }
-        double fee = scanTicket(ticket, rate);
-        if (fee < 0) return false;
-
-        CreditCardTransaction tx = new CreditCardTransaction(fee, nameOnCard, cardNumber);
-        boolean success = tx.initiateTransaction();
-        if (success) ticket.markPaid(fee);
-        return success;
-    }
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
-    @Override
-    public String toString() {
-        return "ParkingAttendantPortal{id='" + id + "'}";
-    }
 }

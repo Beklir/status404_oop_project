@@ -29,9 +29,4 @@ public class CashTransaction extends Payment {
         return Math.max(0, cashTendered - getAmount());
     }
 
-    @Override
-    public String toString() {
-        return String.format("CashTransaction{amount=%.2f, tendered=%.2f, change=%.2f, status=%s}",
-                getAmount(), cashTendered, getChange(), getStatus());
-    }
 }

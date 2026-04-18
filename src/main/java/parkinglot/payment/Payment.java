@@ -15,6 +15,7 @@ public abstract class Payment {
 
     public abstract boolean initiateTransaction();
 
+    // Getters and Setters
     public LocalDateTime getCreationDate() { return creationDate; }
 
     public double getAmount() { return amount; }
@@ -23,8 +24,4 @@ public abstract class Payment {
     public PaymentStatus getStatus() { return status; }
     public void setStatus(PaymentStatus status) { this.status = status; }
 
-    @Override
-    public String toString() {
-        return String.format("Payment{amount=%.2f, status=%s, date=%s}", amount, status, creationDate);
-    }
 }

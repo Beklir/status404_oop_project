@@ -55,8 +55,6 @@ public class ParkingLotDashboard {
     }
 
     public void show() {
-        initializeParkingLotIfNeeded();
-
         stage.setTitle("Parking Lot Dashboard");
 
         Label titleLabel = new Label("Parking Lot Operations");
@@ -98,7 +96,6 @@ public class ParkingLotDashboard {
         root.setAlignment(Pos.TOP_LEFT);
         root.setPadding(new Insets(16));
 
-        refreshDashboard();
 
         Scene scene = new Scene(root, 960, 640);
         stage.setScene(scene);
@@ -119,26 +116,6 @@ public class ParkingLotDashboard {
 
         Button enterButton = new Button("Issue Ticket");
         enterButton.setMaxWidth(Double.MAX_VALUE);
-        enterButton.setOnAction(e -> {
-            String license = licenseField.getText().trim();
-            if (license.isEmpty()) {
-                setStatus("License number is required for entry.");
-                return;
-            }
-
-            VehicleType selectedType = typeBox.getValue();
-            Vehicle vehicle = createVehicle(selectedType, license);
-            ParkingTicket ticket = parkingLot.vehicleEntry(vehicle);
-            if (ticket == null) {
-                setStatus("No spot available for " + selectedType + ".");
-                return;
-            }
-
-            activeVehiclesByLicense.put(license, vehicle);
-            setStatus("Ticket " + ticket.getTicketNumber() + " issued for " + license + ".");
-            licenseField.clear();
-            refreshDashboard();
-        });
 
         GridPane form = new GridPane();
         form.setVgap(8);
@@ -165,33 +142,6 @@ public class ParkingLotDashboard {
 
         Button payButton = new Button("Pay by Cash");
         payButton.setMaxWidth(Double.MAX_VALUE);
-        payButton.setOnAction(e -> {
-            String ticketNumber = ticketField.getText().trim();
-            if (ticketNumber.isEmpty()) {
-                setStatus("Ticket number is required for payment.");
-                return;
-            }
-
-            ParkingTicket ticket = parkingLot.findTicket(ticketNumber);
-            if (ticket == null) {
-                setStatus("Ticket not found: " + ticketNumber);
-                return;
-            }
-
-            double cashTendered;
-            try {
-                cashTendered = Double.parseDouble(cashField.getText().trim());
-            } catch (NumberFormatException ex) {
-                setStatus("Enter a valid numeric cash amount.");
-                return;
-            }
-
-            boolean paid = exitPanel.processPayment(ticket, parkingLot.getParkingRate(), cashTendered);
-            setStatus(paid
-                    ? "Payment successful for ticket " + ticketNumber + "."
-                    : "Payment failed for ticket " + ticketNumber + ".");
-            refreshDashboard();
-        });
 
         GridPane form = new GridPane();
         form.setVgap(8);
@@ -216,80 +166,11 @@ public class ParkingLotDashboard {
 
         Button exitButton = new Button("Exit Vehicle");
         exitButton.setMaxWidth(Double.MAX_VALUE);
-        exitButton.setOnAction(e -> {
-            String license = licenseField.getText().trim();
-            if (license.isEmpty()) {
-                setStatus("License number is required for exit.");
-                return;
-            }
-
-            Vehicle vehicle = activeVehiclesByLicense.get(license);
-            if (vehicle == null) {
-                setStatus("No active vehicle found for license: " + license);
-                return;
-            }
-
-            boolean exited = parkingLot.vehicleExit(vehicle);
-            if (exited) {
-                activeVehiclesByLicense.remove(license);
-                setStatus("Vehicle exited: " + license);
-                licenseField.clear();
-            } else {
-                setStatus("Exit denied for " + license + ". Pay the ticket first.");
-            }
-            refreshDashboard();
-        });
 
         VBox card = new VBox(10, sectionTitle, new Label("License"), licenseField, exitButton);
         card.setPadding(new Insets(12));
         card.setStyle("-fx-border-color: #d0d0d0; -fx-border-radius: 8; -fx-background-radius: 8;");
         return card;
-    }
-
-    private void initializeParkingLotIfNeeded() {
-        try {
-            parkingLot = ParkingLot.getInstance();
-        } catch (IllegalStateException ignored) {
-            parkingLot = ParkingLot.getInstance(
-                    "LOT-01",
-                    "Status404 Parking",
-                    new Location("Main Street", "Giza", "Giza", "12511", "Egypt")
-            );
-        }
-
-        if (parkingLot.getFloors().isEmpty()) {
-            ParkingFloor f1 = new ParkingFloor("F1");
-            f1.addParkingSlot(new CompactSpot("F1-C1"));
-            f1.addParkingSlot(new CompactSpot("F1-C2"));
-            f1.addParkingSlot(new LargeSpot("F1-L1"));
-            f1.addParkingSlot(new MotorbikeSpot("F1-M1"));
-            f1.addParkingSlot(new ElectricSpot("F1-E1"));
-            f1.addParkingSlot(new HandicappedSpot("F1-H1"));
-
-            ParkingFloor f2 = new ParkingFloor("F2");
-            f2.addParkingSlot(new CompactSpot("F2-C1"));
-            f2.addParkingSlot(new LargeSpot("F2-L1"));
-            f2.addParkingSlot(new LargeSpot("F2-L2"));
-            f2.addParkingSlot(new MotorbikeSpot("F2-M1"));
-            f2.addParkingSlot(new ElectricSpot("F2-E1"));
-
-            parkingLot.addParkingFloor(f1);
-            parkingLot.addParkingFloor(f2);
-        }
-
-        if (parkingLot.getEntrancePanels().isEmpty()) {
-            entrancePanel = new EntrancePanel("EN-1");
-            parkingLot.addEntrancePanel(entrancePanel);
-        } else {
-            entrancePanel = parkingLot.getEntrancePanels().get(0);
-        }
-
-        if (parkingLot.getExitPanels().isEmpty()) {
-            exitPanel = new ExitPanel("EX-1");
-            parkingLot.addExitPanel(exitPanel);
-        } else {
-            exitPanel = parkingLot.getExitPanels().get(0);
-        }
     }
 
     private Vehicle createVehicle(VehicleType type, String license) {
@@ -306,28 +187,6 @@ public class ParkingLotDashboard {
             default:
                 return new Car(license);
         }
-    }
-
-    private void refreshDashboard() {
-        metricsLabel.setText(
-                "Lot: " + parkingLot.getName()
-                        + " | Free spots: " + parkingLot.getTotalFreeSpots()
-                        + " | Active tickets: " + parkingLot.getActiveTickets().size()
-        );
-
-        StringBuilder builder = new StringBuilder();
-        for (ParkingTicket ticket : parkingLot.getActiveTickets()) {
-            builder.append(ticket.getTicketNumber())
-                    .append(" | ")
-                    .append(ticket.getVehicleLicense())
-                    .append(" | Spot ")
-                    .append(ticket.getSpotNumber())
-                    .append(" | ")
-                    .append(ticket.getStatus())
-                    .append(System.lineSeparator());
-        }
-
-        ticketsArea.setText(builder.length() == 0 ? "No active tickets." : builder.toString());
     }
 
     private void setStatus(String message) {

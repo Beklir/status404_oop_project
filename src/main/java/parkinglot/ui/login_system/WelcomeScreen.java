@@ -23,7 +23,7 @@ public class WelcomeScreen {
     }
 
     public void show() {
-        stage.setTitle("My Application");
+        stage.setTitle("Parking Lot System");
 
         Label welcomeLabel = new Label("Welcome!");
         welcomeLabel.setFont(Font.font("Times New Roman", FontWeight.BOLD, 60));

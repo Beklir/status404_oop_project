@@ -40,6 +40,7 @@ public abstract class ParkingSpot {
         return true;
     }
 
+    // Getters and Setters
     public boolean getIsFree() { return free; }
 
     public String getNumber() { return number; }
@@ -49,8 +50,4 @@ public abstract class ParkingSpot {
 
     public Vehicle getCurrentVehicle() { return currentVehicle; }
 
-    @Override
-    public String toString() {
-        return String.format("%s{number='%s', free=%b}", getClass().getSimpleName(), number, free);
-    }
 }

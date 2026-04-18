@@ -42,11 +42,6 @@ public abstract class Account {
     public Person getPerson() { return person; }
     public void setPerson(Person person) { this.person = person; }
 
-    // Password setter only — never expose password as getter
     public void setPassword(String password) { this.password = password; }
 
-    @Override
-    public String toString() {
-        return String.format("%s{userName='%s', status=%s}", getClass().getSimpleName(), userName, status);
-    }
 }

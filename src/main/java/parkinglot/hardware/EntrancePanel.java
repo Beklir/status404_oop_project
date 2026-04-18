@@ -10,10 +10,6 @@ public class EntrancePanel {
         this.id = id;
     }
 
-    /**
-     * Issues a new parking ticket for an arriving vehicle.
-     * Returns null if the lot is full (caller must check isFull first).
-     */
     public ParkingTicket printTicket(Vehicle vehicle, String assignedSpotNumber) {
         ParkingTicket ticket = new ParkingTicket(vehicle.getLicenseNumber(), assignedSpotNumber);
         vehicle.assignTicket(ticket);
@@ -30,8 +26,4 @@ public class EntrancePanel {
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
-    @Override
-    public String toString() {
-        return "EntrancePanel{id='" + id + "'}";
-    }
 }

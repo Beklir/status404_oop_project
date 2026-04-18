@@ -12,9 +12,6 @@ public class ExitPanel {
         this.id = id;
     }
 
-    /**
-     * Scans a ticket and returns the fee due (0 if already paid).
-     */
     public double scanTicket(ParkingTicket ticket, ParkingRate rate) {
         if (ticket == null) {
             System.out.println("[ExitPanel " + id + "] Invalid ticket.");
@@ -32,27 +29,7 @@ public class ExitPanel {
         return fee;
     }
 
-    /**
-     * Process credit card payment at the exit panel.
-     */
-    public boolean processPayment(ParkingTicket ticket, ParkingRate rate,
-                                  String nameOnCard, String cardNumber) {
-        double fee = scanTicket(ticket, rate);
-        if (fee < 0) return false;
-        if (fee == 0) return true; // already paid
-
-        CreditCardTransaction tx = new CreditCardTransaction(fee, nameOnCard, cardNumber);
-        boolean success = tx.initiateTransaction();
-        if (success) {
-            ticket.markPaid(fee);
-            openGate();
-        }
-        return success;
-    }
-
-    /**
-     * Process cash payment at the exit panel.
-     */
+//    Cash Payment
     public boolean processPayment(ParkingTicket ticket, ParkingRate rate, double cashTendered) {
         double fee = scanTicket(ticket, rate);
         if (fee < 0) return false;
@@ -74,8 +51,4 @@ public class ExitPanel {
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
-    @Override
-    public String toString() {
-        return "ExitPanel{id='" + id + "'}";
-    }
 }

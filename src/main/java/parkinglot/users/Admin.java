@@ -50,16 +50,4 @@ public class Admin extends Account {
         return true;
     }
 
-    public boolean modifyParkingRate(ParkingRate rate, int hourNumber, double newRate) {
-        rate.setHourRate(hourNumber, newRate);
-        System.out.printf("Admin %s updated hour %d rate to $%.2f%n",
-                getUserName(), hourNumber, newRate);
-        return true;
-    }
-
-    public boolean modifyDefaultRate(ParkingRate rate, double newRate) {
-        rate.setDefaultRate(newRate);
-        System.out.printf("Admin %s updated default rate to $%.2f%n", getUserName(), newRate);
-        return true;
-    }
 }

@@ -63,7 +63,7 @@ public class LoginWindow {
 //        ------------------Controls---------------------
 
         loginButton.setOnAction(e -> {
-            String username = usernameField.getText();
+            String username = usernameField.getText().trim();
             String password = passwordField.getText();
 
             boolean authenticated = false;
@@ -75,13 +75,17 @@ public class LoginWindow {
                 }
             }
 
-            if (!username.isEmpty() && !password.isEmpty()) {
-                if (authenticated) {
-                    new WelcomeScreen(stage, username).show();
-                } else {
-                    loginLabel.setText("Incorrect username or password.");
-                    loginLabel.setTextFill(Color.RED);
-                }
+            if (username.isEmpty() || password.isEmpty()) {
+                loginLabel.setText("Please enter username and password.");
+                loginLabel.setTextFill(Color.RED);
+                return;
+            }
+
+            if (authenticated) {
+                new WelcomeScreen(stage, username).show();
+            } else {
+                loginLabel.setText("Incorrect username or password.");
+                loginLabel.setTextFill(Color.RED);
             }
         });
 
