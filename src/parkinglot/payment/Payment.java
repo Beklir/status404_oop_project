@@ -15,7 +15,6 @@ public abstract class Payment {
 
     public abstract boolean initiateTransaction();
 
-    // Getters and Setters
     public LocalDateTime getCreationDate() { return creationDate; }
 
     public double getAmount() { return amount; }

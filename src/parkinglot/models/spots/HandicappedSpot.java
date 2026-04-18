@@ -1,4 +1,9 @@
 package parkinglot.models.spots;
 
-public class HandicappedSpot {
+import parkinglot.constants.ParkingSpotType;
+
+public class HandicappedSpot extends ParkingSpot {
+    public HandicappedSpot(String number) {
+        super(number, ParkingSpotType.HANDICAPPED);
+    }
 }

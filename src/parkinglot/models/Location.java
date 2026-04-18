@@ -15,7 +15,6 @@ public class Location {
         this.country = country;
     }
 
-    // Getters and Setters
     public String getStreetAddress() { return streetAddress; }
     public void setStreetAddress(String streetAddress) { this.streetAddress = streetAddress; }
 

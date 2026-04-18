@@ -1,4 +1,9 @@
 package parkinglot.models.vehicles;
 
-public class Van {
+import parkinglot.constants.VehicleType;
+
+public class Van extends Vehicle {
+    public Van(String licenseNumber) {
+        super(licenseNumber, VehicleType.VAN);
+    }
 }

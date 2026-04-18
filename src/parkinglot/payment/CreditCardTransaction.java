@@ -5,11 +5,10 @@ public class CreditCardTransaction extends Payment {
     private final String cardNumber;   // stored masked for security
     private double cardBalance;
 
-    public CreditCardTransaction(double amount, String nameOnCard, String cardNumber, double cardBalance) {
+    public CreditCardTransaction(double amount, String nameOnCard, String cardNumber) {
         super(amount);
         this.nameOnCard = nameOnCard;
         this.cardNumber = maskCardNumber(cardNumber);
-        this.cardBalance = cardBalance;
     }
 
     private String maskCardNumber(String cardNumber) {
