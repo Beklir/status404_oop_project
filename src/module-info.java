@@ -7,5 +7,5 @@ module parkinglot {
 
     // IMPORTANT: Open the package to javafx.graphics
     // This allows JavaFX to launch the Application class
-    opens parkinglot to javafx.graphics;
+    opens parkinglot;
 }
