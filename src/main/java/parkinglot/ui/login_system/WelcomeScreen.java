@@ -1,0 +1,53 @@
+package parkinglot.ui.login_system;
+
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.stage.Stage;
+
+public class WelcomeScreen {
+
+    private final Stage stage;
+    private final String username;
+
+    public WelcomeScreen(Stage stage, String username) {
+        this.stage = stage;
+        this.username = username;
+    }
+
+    public void show() {
+        stage.setTitle("My Application");
+
+        Label welcomeLabel = new Label("Welcome!");
+        welcomeLabel.setFont(Font.font("Times New Roman", FontWeight.BOLD, 60));
+
+        Label usernameRow = new Label("Logged in as: " + username);
+        usernameRow.setFont(Font.font("Times New Roman", 40));
+
+        Button logOutButton = new Button("Log Out");
+
+        VBox infoCard = new VBox(20, welcomeLabel, usernameRow, logOutButton);
+        infoCard.setAlignment(Pos.CENTER);
+        infoCard.setPadding(new Insets(16, 20, 16, 20));
+
+        StackPane root = new StackPane(infoCard);
+        root.setPadding(new Insets(16));
+
+        Scene scene = new Scene(root,460,440);
+        stage.setScene(scene);
+        stage.setResizable(false);
+        stage.show();
+
+//        --------------Controls------------
+
+        logOutButton.setOnAction(e -> {
+                new LoginWindow(stage).show();
+        });
+    }
+}
