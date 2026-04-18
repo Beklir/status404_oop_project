@@ -10,6 +10,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import parkinglot.ui.ParkingLotDashboard;
 
 public class WelcomeScreen {
 
@@ -30,9 +31,10 @@ public class WelcomeScreen {
         Label usernameRow = new Label("Logged in as: " + username);
         usernameRow.setFont(Font.font("Times New Roman", 40));
 
+        Button openDashboardButton = new Button("Open Parking Dashboard");
         Button logOutButton = new Button("Log Out");
 
-        VBox infoCard = new VBox(20, welcomeLabel, usernameRow, logOutButton);
+        VBox infoCard = new VBox(20, welcomeLabel, usernameRow, openDashboardButton, logOutButton);
         infoCard.setAlignment(Pos.CENTER);
         infoCard.setPadding(new Insets(16, 20, 16, 20));
 
@@ -45,6 +47,8 @@ public class WelcomeScreen {
         stage.show();
 
 //        --------------Controls------------
+
+        openDashboardButton.setOnAction(e -> new ParkingLotDashboard(stage, username).show());
 
         logOutButton.setOnAction(e -> {
                 new LoginWindow(stage).show();
