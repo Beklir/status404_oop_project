@@ -8,6 +8,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -35,6 +36,7 @@ import parkinglot.ui.login_system.WelcomeScreen;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class ParkingLotDashboard {
     private final Stage stage;
@@ -98,6 +100,10 @@ public class ParkingLotDashboard {
 
 
         Scene scene = new Scene(root, 960, 640);
+
+        Image icon = new  Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/parking_icon.png")));
+
+        stage.getIcons().setAll(icon);
         stage.setScene(scene);
         stage.setResizable(true);
         stage.show();

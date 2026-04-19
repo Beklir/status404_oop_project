@@ -5,12 +5,15 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import parkinglot.ui.ParkingLotDashboard;
+
+import java.util.Objects;
 
 public class WelcomeScreen {
 
@@ -42,6 +45,10 @@ public class WelcomeScreen {
         root.setPadding(new Insets(16));
 
         Scene scene = new Scene(root,460,440);
+
+        Image icon = new  Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/parking_icon.png")));
+
+        stage.getIcons().setAll(icon);
         stage.setScene(scene);
         stage.setResizable(false);
         stage.show();
@@ -50,8 +57,6 @@ public class WelcomeScreen {
 
         openDashboardButton.setOnAction(e -> new ParkingLotDashboard(stage, username).show());
 
-        logOutButton.setOnAction(e -> {
-                new LoginWindow(stage).show();
-        });
+        logOutButton.setOnAction(e -> {new LoginWindow(stage).show();});
     }
 }

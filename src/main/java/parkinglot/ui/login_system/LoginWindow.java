@@ -4,10 +4,13 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.*;
 import javafx.stage.Stage;
+
+import java.util.Objects;
 
 
 public class LoginWindow {
@@ -56,6 +59,10 @@ public class LoginWindow {
 
 
         Scene scene = new Scene(root, 460, 440);
+
+        Image icon = new  Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/login_icon.png")));
+
+        stage.getIcons().setAll(icon);
         stage.setScene(scene);
         stage.setResizable(false);
         stage.show();
