@@ -1,16 +1,33 @@
 package parkinglot.payment;
 
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "payment_type")
 public abstract class Payment {
-    private final LocalDateTime creationDate;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id; // SQLite will auto-increment this
+
+    private LocalDateTime creationDate;
     private double amount;
+
+    @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 
-    public Payment(double amount) {
-        this.amount = amount;
+    // Standard no-args constructor for JPA
+    protected Payment() {
         this.creationDate = LocalDateTime.now();
         this.status = PaymentStatus.PENDING;
+    }
+
+    public Payment(double amount) {
+        this();
+        this.amount = amount;
     }
 
     public abstract boolean initiateTransaction();

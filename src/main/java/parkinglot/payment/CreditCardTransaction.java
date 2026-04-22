@@ -1,11 +1,21 @@
 package parkinglot.payment;
 
+import jakarta.persistence.*;
+
+@Entity
+@DiscriminatorValue("CREDIT_CARD")
 public class CreditCardTransaction extends Payment {
+
     private String nameOnCard;
-    private final String cardNumber;   // stored masked for security
+    private String cardNumber;
     private double cardBalance;
 
-    public CreditCardTransaction(double amount, String nameOnCard, String cardNumber,  double cardBalance) {
+    // --- Required for Hibernate ---
+    protected CreditCardTransaction() {
+        super();
+    }
+
+    public CreditCardTransaction(double amount, String nameOnCard, String cardNumber, double cardBalance) {
         super(amount);
         this.nameOnCard = nameOnCard;
         this.cardNumber = maskCardNumber(cardNumber);
@@ -25,7 +35,7 @@ public class CreditCardTransaction extends Payment {
             setStatus(PaymentStatus.DECLINED);
             System.out.println("Credit card declined");
             return false;
-        }else {
+        } else {
             setStatus(PaymentStatus.COMPLETED);
             cardBalance -= getAmount();
             System.out.println("Credit card payment successful.");
@@ -37,6 +47,8 @@ public class CreditCardTransaction extends Payment {
     public void setNameOnCard(String nameOnCard) { this.nameOnCard = nameOnCard; }
 
     public String getCardNumber() { return cardNumber; }
+    public void setCardNumber(String cardNumber) { this.cardNumber = cardNumber; }
 
     public double getCardBalance() { return cardBalance; }
+    public void setCardBalance(double cardBalance) { this.cardBalance = cardBalance; }
 }

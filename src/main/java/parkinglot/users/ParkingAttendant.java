@@ -1,16 +1,22 @@
 package parkinglot.users;
 
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 import parkinglot.models.ParkingTicket;
 import parkinglot.models.ParkingRate;
 import parkinglot.payment.CashTransaction;
 import parkinglot.payment.Payment;
 import parkinglot.payment.PaymentStatus;
 
+
+@Entity
+@DiscriminatorValue("ATTENDANT")
 public class ParkingAttendant extends Account {
 
     public ParkingAttendant(String userName, String password, Person person) {
         super(userName, password, person);
     }
+    protected ParkingAttendant(){super();}
 
     public boolean processTicket(ParkingTicket ticket, ParkingRate rate) {
         if (ticket == null) {

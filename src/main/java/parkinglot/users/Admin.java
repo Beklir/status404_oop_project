@@ -1,5 +1,7 @@
 package parkinglot.users;
 
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 import parkinglot.models.ParkingFloor;
 import parkinglot.models.ParkingLot;
 import parkinglot.models.ParkingRate;
@@ -7,11 +9,14 @@ import parkinglot.models.spots.*;
 import parkinglot.hardware.EntrancePanel;
 import parkinglot.hardware.ExitPanel;
 
+@Entity
+@DiscriminatorValue("ADMIN")
 public class Admin extends Account {
 
     public Admin(String userName, String password, Person person) {
         super(userName, password, person);
     }
+    protected Admin() {}
 
     public boolean addParkingFloor(ParkingLot lot, ParkingFloor floor) {
         lot.addParkingFloor(floor);

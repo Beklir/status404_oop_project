@@ -1,12 +1,25 @@
 package parkinglot.users;
 
+import jakarta.persistence.*;
 import parkinglot.constants.AccountStatus;
 
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "account_type")
 public abstract class Account {
+
+    @Id
     private String userName;
+
     private String password;
+
+    @Enumerated(EnumType.STRING)
     private AccountStatus status;
+
+    @Embedded
     private Person person;
+
+    protected Account() {}
 
     public Account(String userName, String password, Person person) {
         this.userName = userName;

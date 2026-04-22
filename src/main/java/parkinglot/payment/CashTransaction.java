@@ -1,7 +1,18 @@
 package parkinglot.payment;
 
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+
+@Entity
+@DiscriminatorValue("CASH")
 public class CashTransaction extends Payment {
+
     private double cashTendered;
+
+    // --- Hibernate Required No-args Constructor ---
+    protected CashTransaction() {
+        super();
+    }
 
     public CashTransaction(double amount, double cashTendered) {
         super(amount);

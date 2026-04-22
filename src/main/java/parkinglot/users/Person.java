@@ -1,5 +1,13 @@
 package parkinglot.users;
 
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embedded;
 import parkinglot.models.Location;
 
-public record Person(String name, Location address, String email, String phone){}
+@Embeddable
+public record Person(
+        String name,
+        @Embedded Location address,
+        String email,
+        String phone
+) {}
