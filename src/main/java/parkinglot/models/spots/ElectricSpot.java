@@ -1,10 +1,15 @@
 package parkinglot.models.spots;
 
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 import parkinglot.constants.ParkingSpotType;
 import parkinglot.constants.VehicleType;
 import parkinglot.models.vehicles.Vehicle;
 
+@Entity
+@DiscriminatorValue("ELECTRIC")
 public class ElectricSpot extends ParkingSpot {
+    protected ElectricSpot(){super();}
 
     public ElectricSpot(String number) {
         super(number, ParkingSpotType.ELECTRIC);

@@ -9,11 +9,24 @@ import parkinglot.models.vehicles.Vehicle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import jakarta.persistence.*;
 
+@Entity
 public class ParkingFloor {
+
+    @Id
     private String name;
-    private List<ParkingSpot> spots;
+
+    // One floor has many spots.
+    // We use EAGER so that when you load the floor, you can immediately see which spots are free.
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "floor_id")
+    private List<ParkingSpot> spots = new ArrayList<>();
+
+    @Transient
     private ParkingDisplayBoard displayBoard;
+
+    protected ParkingFloor() {}
 
     public ParkingFloor(String name) {
         this.name = name;

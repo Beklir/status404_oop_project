@@ -2,11 +2,26 @@ package parkinglot.models.vehicles;
 
 import parkinglot.constants.VehicleType;
 import parkinglot.models.ParkingTicket;
+import jakarta.persistence.*;
 
+
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "vehicle_category")
 public abstract class Vehicle {
+    @Id
     private String licenseNumber;
+
+    @Enumerated(EnumType.STRING)
     private VehicleType type;
+
+    // Relationship to the Ticket
+    // cascade = ALL means if you save the Vehicle, the ticket is saved too.
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "ticket_id")
     private ParkingTicket ticket;
+
+    protected Vehicle() {}
 
     public Vehicle(String licenseNumber, VehicleType type) {
         this.licenseNumber = licenseNumber;

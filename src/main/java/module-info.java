@@ -1,6 +1,7 @@
 module parkinglot {
     requires javafx.controls;
     requires javafx.graphics;
+    requires jakarta.persistence;
 
     // Export the package to allow other modules to use it
     exports parkinglot;

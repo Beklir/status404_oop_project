@@ -1,5 +1,6 @@
 package parkinglot.models;
 
+import jakarta.persistence.*;
 import parkinglot.constants.ParkingSpotType;
 import parkinglot.constants.VehicleType;
 import parkinglot.hardware.EntrancePanel;
@@ -11,17 +12,40 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Entity
 public class ParkingLot {
+    @Id
     private String id;
     private String name;
-    private Location address;
-    private ParkingRate parkingRate;
-    private List<ParkingFloor> floors;
-    private List<EntrancePanel> entrancePanels;
-    private List<ExitPanel> exitPanels;
-    private List<ParkingTicket> activeTickets;
 
-    private ParkingLot(String id, String name, Location address) {
+    @Embedded
+    private Location address;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "rate_id")
+    private ParkingRate parkingRate;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "parking_lot_id") // Creates a foreign key in the floor table
+    private List<ParkingFloor> floors = new ArrayList<>();
+
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "parking_lot_id")
+    private List<EntrancePanel> entrancePanels = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "parking_lot_id")
+    private List<ExitPanel> exitPanels = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "parking_lot_id")
+    private List<ParkingTicket> activeTickets = new ArrayList<>();
+
+
+    protected ParkingLot() {}
+
+    public ParkingLot(String id, String name, Location address) {
         this.id = id;
         this.name = name;
         this.address = address;

@@ -2,12 +2,27 @@ package parkinglot.models.spots;
 
 import parkinglot.constants.ParkingSpotType;
 import parkinglot.models.vehicles.Vehicle;
+import jakarta.persistence.*;
 
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "spot_category")         // Column to tell types apart
 public abstract class ParkingSpot {
+
+    @Id
     private String number;
+
     private boolean free;
+
+    @Enumerated(EnumType.STRING)
     private ParkingSpotType type;
+
+    // One-to-One relationship with Vehicle
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "vehicle_id")
     private Vehicle currentVehicle;
+
+    protected ParkingSpot() {}
 
     public ParkingSpot(String number, ParkingSpotType type) {
         this.number = number;
