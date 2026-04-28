@@ -10,6 +10,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.*;
 import javafx.stage.Stage;
+import parkinglot.managers.AppContext;
 import parkinglot.server.ServerUI;
 
 import java.util.Objects;
@@ -17,13 +18,16 @@ import java.util.Objects;
 
 public class LoginWindow {
 
+    private final AppContext appContext;
     private final Stage stage;
     private final TextField ipField = new TextField();
     private final TextField portField = new TextField();
 
-    public LoginWindow(Stage stage) {
-        // TODO: Set default ip and port values here.
-        this.stage = stage;
+    public LoginWindow(AppContext appContext) {
+        this.appContext = appContext;
+        this.stage = appContext.stage;
+        ipField.setText(appContext.apiManager.getServerAddress().ip);
+        ipField.setText(String.valueOf(appContext.apiManager.getServerAddress().port));
     }
 
     public void show() {
@@ -97,7 +101,7 @@ public class LoginWindow {
             }
 
             if (authenticated) {
-                new WelcomeScreen(stage, username).show();
+                new WelcomeScreen(appContext, username).show();
             } else {
                 loginLabel.setText("Incorrect username or password.");
                 loginLabel.setTextFill(Color.RED);
@@ -105,19 +109,25 @@ public class LoginWindow {
         });
 
 
-        registerLink.setOnAction(e -> new RegistrationWindow(stage).show()); //
+        registerLink.setOnAction(e -> new RegistrationWindow(appContext).show()); //
     }
 
     private Pane getTopRightPane() {
         ipField.setPromptText("Server IP Addr.");
         ipField.setPrefWidth(120);
+        ipField.textProperty().addListener((_, _, newValue) -> {appContext.apiManager.setServerIp(newValue);});
 
         portField.setPromptText("Port");
         portField.setPrefWidth(50);
+        portField.textProperty().addListener((_, _, newValue) -> {
+            try{
+                appContext.apiManager.setServerPort(Integer.parseInt(newValue));
+            } catch (NumberFormatException _) {}
+        });
 
         Hyperlink button = new Hyperlink("Host Server");
         button.setOnMouseClicked(_->{
-            new ServerUI(stage).show();
+            new ServerUI(appContext).show();
         });
 
         HBox hBox = new HBox(10, ipField, portField);

@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 import parkinglot.constants.VehicleType;
 import parkinglot.hardware.EntrancePanel;
 import parkinglot.hardware.ExitPanel;
+import parkinglot.managers.AppContext;
 import parkinglot.models.Location;
 import parkinglot.models.ParkingFloor;
 import parkinglot.models.ParkingLot;
@@ -39,6 +40,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public class ParkingLotDashboard {
+    private final AppContext appContext;
     private final Stage stage;
     private final String username;
 
@@ -51,8 +53,9 @@ public class ParkingLotDashboard {
     private Label metricsLabel;
     private TextArea ticketsArea;
 
-    public ParkingLotDashboard(Stage stage, String username) {
-        this.stage = stage;
+    public ParkingLotDashboard(AppContext appContext, String username) {
+        this.appContext = appContext;
+        this.stage = appContext.stage;
         this.username = username;
     }
 
@@ -82,7 +85,7 @@ public class ParkingLotDashboard {
         ticketsArea.setPromptText("Active tickets will appear here...");
 
         Button backButton = new Button("Back");
-        backButton.setOnAction(e -> new WelcomeScreen(stage, username).show());
+        backButton.setOnAction(e -> new WelcomeScreen(appContext, username).show());
 
         VBox root = new VBox(
                 12,

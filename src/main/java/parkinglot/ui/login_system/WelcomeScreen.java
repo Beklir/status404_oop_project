@@ -11,17 +11,20 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import parkinglot.managers.AppContext;
 import parkinglot.ui.ParkingLotDashboard;
 
 import java.util.Objects;
 
 public class WelcomeScreen {
 
+    private final AppContext appContext;
     private final Stage stage;
     private final String username;
 
-    public WelcomeScreen(Stage stage, String username) {
-        this.stage = stage;
+    public WelcomeScreen(AppContext appContext, String username) {
+        this.appContext = appContext;
+        this.stage = appContext.stage;
         this.username = username;
     }
 
@@ -55,8 +58,8 @@ public class WelcomeScreen {
 
 //        --------------Controls------------
 
-        openDashboardButton.setOnAction(e -> new ParkingLotDashboard(stage, username).show());
+        openDashboardButton.setOnAction(e -> new ParkingLotDashboard(appContext, username).show());
 
-        logOutButton.setOnAction(e -> {new LoginWindow(stage).show();});
+        logOutButton.setOnAction(e -> {new LoginWindow(appContext).show();});
     }
 }

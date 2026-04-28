@@ -14,6 +14,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.web.server.WebServer;
 import org.springframework.boot.web.server.context.WebServerApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
+import parkinglot.managers.AppContext;
 import parkinglot.ui.login_system.LoginWindow;
 
 import java.io.OutputStream;
@@ -24,10 +25,12 @@ public class ServerUI {
 
     private ConfigurableApplicationContext springContext;
     private TextArea logArea;
+    private final AppContext appContext;
     private final Stage stage;
 
-    public ServerUI(Stage stage){
-        this.stage = stage;
+    public ServerUI(AppContext appContext){
+        this.appContext = appContext;
+        this.stage = appContext.stage;
         new Thread(() -> {
             ConfigurableApplicationContext context = SpringApplication.run(ServerApplication.class);
 
@@ -82,7 +85,7 @@ public class ServerUI {
             springContext.close();
             System.setOut(originalOut);
             System.setErr(originalErr);
-            new LoginWindow(stage).show();
+            new LoginWindow(appContext).show();
         });
 
         HBox actionPane = new HBox(10, stopButton);

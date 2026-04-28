@@ -8,6 +8,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
 import javafx.stage.Stage;
+import parkinglot.managers.AppContext;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -16,9 +17,11 @@ import java.util.Objects;
 public class RegistrationWindow{
 
     private final Stage stage;
+    private final AppContext appContext;
 
-    public RegistrationWindow(Stage stage) {
-        this.stage = stage;
+    public RegistrationWindow(AppContext appContext) {
+        this.appContext = appContext;
+        this.stage = appContext.stage;
     }
 
     public void show() {
@@ -103,7 +106,7 @@ public class RegistrationWindow{
             }else {
                 try {
                     Database.saveUser(new User(username, password, email));
-                    new LoginWindow(stage).show();
+                    new LoginWindow(appContext).show();
                 } catch (IOException ex) {
                     registerLabel.setText("Error saving user.");
                 }
@@ -111,6 +114,6 @@ public class RegistrationWindow{
         });
 
 
-        loginLink.setOnAction(e -> new LoginWindow(stage).show());
+        loginLink.setOnAction(e -> new LoginWindow(appContext).show());
     }
 }
