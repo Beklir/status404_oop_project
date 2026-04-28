@@ -1,10 +1,18 @@
 package parkinglot.models.vehicles;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import parkinglot.constants.VehicleType;
 import parkinglot.models.ParkingTicket;
 import jakarta.persistence.*;
 
-
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = Car.class, name = "CAR"),
+        @JsonSubTypes.Type(value = Motorbike.class, name = "MOTORBIKE"),
+        @JsonSubTypes.Type(value = Van.class, name = "VAN"),
+        @JsonSubTypes.Type(value = Truck.class, name = "TRUCK")
+})
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "vehicle_category")

@@ -101,7 +101,7 @@ public class LoginWindow {
 
                 boolean authenticated = false;
                 try {
-                    Account account = appContext.apiManager.login(username, password);
+                    Account account = appContext.apiManager.login(username, password).user();
                     authenticated = account != null;
                     appContext.setAccount(account);
                 } catch (Exception ex) {

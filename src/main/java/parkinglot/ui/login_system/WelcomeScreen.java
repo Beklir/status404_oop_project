@@ -59,7 +59,7 @@ public class WelcomeScreen {
         openDashboardButton.setOnAction(e -> new ParkingLotDashboard(appContext).show());
 
         logOutButton.setOnAction(_ -> {
-            appContext.setAccount(null);
+            appContext.logOut();
             new LoginWindow(appContext).show();
         });
     }

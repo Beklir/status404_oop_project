@@ -1,13 +1,18 @@
 package parkinglot.managers;
 
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import parkinglot.constants.VehicleType;
 import parkinglot.models.ParkingLot;
 import parkinglot.models.ParkingTicket;
 import parkinglot.users.Account;
+import parkinglot.utils.LoginResponse;
 
 public class APIManager {
+    private String authToken = null;
     private ServerAddress serverAddress;
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -32,19 +37,31 @@ public class APIManager {
 
     public ServerAddress getServerAddress() {return serverAddress;}
 
+    public void clearToken(){this.authToken = null;}
+
+    private HttpEntity<Void> getAuthHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(authToken);
+        return new HttpEntity<>(headers);
+    }
+
     // 1. Health Check
     public String checkHealth() {
         return restTemplate.getForObject(serverAddress + "/health", String.class);
     }
 
-    public Account login(String username, String password) throws Exception{
+    public LoginResponse login(String username, String password) throws Exception{
         String url = UriComponentsBuilder.fromUriString(serverAddress + "/api/accounts/login")
                 .queryParam("user", username)
                 .queryParam("pass", password)
                 .toUriString();
 
         try {
-            return restTemplate.postForObject(url, null, Account.class);
+            LoginResponse response = restTemplate.postForObject(url, null, LoginResponse.class);
+            if (response != null) {
+                this.authToken = response.token();
+            }
+            return response;
         } catch (org.springframework.web.client.HttpClientErrorException.Unauthorized e) {
             return null;
         } catch (Exception e) {
@@ -55,7 +72,13 @@ public class APIManager {
 
     // 3. Get Parking Lot Status
     public ParkingLot getStatus() {
-        return restTemplate.getForObject(serverAddress + "/api/parking/status", ParkingLot.class);
+        // Use exchange instead of getForObject to send headers
+        return restTemplate.exchange(
+                serverAddress + "/api/parking/status",
+                HttpMethod.GET,
+                getAuthHeaders(),
+                ParkingLot.class
+        ).getBody();
     }
 
     // 4. Vehicle Entry

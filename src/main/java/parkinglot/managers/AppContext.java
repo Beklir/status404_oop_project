@@ -15,4 +15,8 @@ public class AppContext {
     public void setAccount(Account account){
         this.account = account;
     }
+    public void logOut(){
+        setAccount(null);
+        apiManager.clearToken();
+    }
 }

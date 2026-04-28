@@ -1,9 +1,18 @@
 package parkinglot.models.spots;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import parkinglot.constants.ParkingSpotType;
 import parkinglot.models.vehicles.Vehicle;
 import jakarta.persistence.*;
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = CompactSpot.class, name = "COMPACT"),
+        @JsonSubTypes.Type(value = LargeSpot.class, name = "LARGE"),
+        @JsonSubTypes.Type(value = MotorbikeSpot.class, name = "MOTORBIKE"),
+        @JsonSubTypes.Type(value = ElectricSpot.class, name = "ELECTRIC")
+})
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "spot_category")         // Column to tell types apart
