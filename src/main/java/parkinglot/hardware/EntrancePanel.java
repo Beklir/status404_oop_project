@@ -1,9 +1,13 @@
 package parkinglot.hardware;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import parkinglot.models.ParkingTicket;
 import parkinglot.models.vehicles.Vehicle;
 
+@Entity
 public class EntrancePanel {
+    @Id
     private String id;
 
     public EntrancePanel(String id) {

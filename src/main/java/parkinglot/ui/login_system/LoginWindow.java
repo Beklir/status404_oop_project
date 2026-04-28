@@ -2,6 +2,7 @@ package parkinglot.ui.login_system;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -9,6 +10,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.*;
 import javafx.stage.Stage;
+import parkinglot.server.ServerUI;
 
 import java.util.Objects;
 
@@ -16,8 +18,11 @@ import java.util.Objects;
 public class LoginWindow {
 
     private final Stage stage;
+    private final TextField ipField = new TextField();
+    private final TextField portField = new TextField();
 
     public LoginWindow(Stage stage) {
+        // TODO: Set default ip and port values here.
         this.stage = stage;
     }
 
@@ -52,10 +57,13 @@ public class LoginWindow {
                 registerLink
         );
         card.setAlignment(Pos.CENTER);
-        card.setPadding(new Insets(36, 40, 36, 40));
+        card.setPadding(new Insets(56, 40, 36, 40));
 
-        StackPane root = new StackPane(card);
-        root.setPadding(new Insets(40));
+        Node topRight = getTopRightPane();
+
+        StackPane root = new StackPane(card, topRight);
+        StackPane.setAlignment(topRight, Pos.TOP_RIGHT);
+        root.setPadding(new Insets(20, 40,40,40));
 
 
         Scene scene = new Scene(root, 460, 440);
@@ -98,5 +106,40 @@ public class LoginWindow {
 
 
         registerLink.setOnAction(e -> new RegistrationWindow(stage).show()); //
+    }
+
+    private Pane getTopRightPane() {
+        ipField.setPromptText("Server IP Addr.");
+        ipField.setPrefWidth(120);
+
+        portField.setPromptText("Port");
+        portField.setPrefWidth(50);
+
+        Hyperlink button = new Hyperlink("Host Server");
+        button.setOnMouseClicked(_->{
+            new ServerUI(stage).show();
+        });
+
+        HBox hBox = new HBox(10, ipField, portField);
+        hBox.setAlignment(Pos.CENTER_RIGHT);
+
+        VBox content = new VBox(5, hBox, button);
+        content.setAlignment(Pos.TOP_RIGHT);
+        content.setVisible(false);
+        content.setManaged(false);
+
+        Hyperlink toggleBtn = new Hyperlink("Connect...");
+        toggleBtn.setOnAction(e -> {
+            boolean isVisible = content.isVisible();
+            content.setVisible(!isVisible);
+            content.setManaged(!isVisible);
+            toggleBtn.setText(isVisible ? "Connect..." : "Hide");
+        });
+
+        VBox container = new VBox(5, toggleBtn, content);
+        container.setAlignment(Pos.TOP_RIGHT);
+        container.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+
+        return container;
     }
 }

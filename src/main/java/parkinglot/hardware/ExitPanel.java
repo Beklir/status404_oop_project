@@ -1,11 +1,15 @@
 package parkinglot.hardware;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import parkinglot.models.ParkingTicket;
 import parkinglot.models.ParkingRate;
 import parkinglot.payment.CashTransaction;
 import parkinglot.payment.CreditCardTransaction;
 
+@Entity
 public class ExitPanel {
+    @Id
     private String id;
 
     public ExitPanel(String id) {
