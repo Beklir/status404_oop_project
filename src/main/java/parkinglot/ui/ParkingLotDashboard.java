@@ -42,7 +42,6 @@ import java.util.Objects;
 public class ParkingLotDashboard {
     private final AppContext appContext;
     private final Stage stage;
-    private final String username;
 
     private ParkingLot parkingLot;
     private EntrancePanel entrancePanel;
@@ -53,10 +52,9 @@ public class ParkingLotDashboard {
     private Label metricsLabel;
     private TextArea ticketsArea;
 
-    public ParkingLotDashboard(AppContext appContext, String username) {
+    public ParkingLotDashboard(AppContext appContext) {
         this.appContext = appContext;
         this.stage = appContext.stage;
-        this.username = username;
     }
 
     public void show() {
@@ -85,12 +83,12 @@ public class ParkingLotDashboard {
         ticketsArea.setPromptText("Active tickets will appear here...");
 
         Button backButton = new Button("Back");
-        backButton.setOnAction(e -> new WelcomeScreen(appContext, username).show());
+        backButton.setOnAction(e -> new WelcomeScreen(appContext).show());
 
         VBox root = new VBox(
                 12,
                 titleLabel,
-                new Label("Signed in as: " + username),
+                new Label("Signed in as: " + appContext.account.getUserName()),
                 metricsLabel,
                 operationsRow,
                 new Label("Active Tickets"),

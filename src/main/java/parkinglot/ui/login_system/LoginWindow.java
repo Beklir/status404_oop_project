@@ -103,6 +103,7 @@ public class LoginWindow {
                 try {
                     Account account = appContext.apiManager.login(username, password);
                     authenticated = account != null;
+                    appContext.setAccount(account);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     Platform.runLater(() -> {
@@ -114,7 +115,7 @@ public class LoginWindow {
 
 
                 if (authenticated) {
-                    Platform.runLater(() -> new WelcomeScreen(appContext, username).show());
+                    Platform.runLater(() -> new WelcomeScreen(appContext).show());
                 } else {
                     Platform.runLater(() -> {
                         loginLabel.setText("Incorrect username or password.");

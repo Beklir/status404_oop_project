@@ -20,12 +20,10 @@ public class WelcomeScreen {
 
     private final AppContext appContext;
     private final Stage stage;
-    private final String username;
 
-    public WelcomeScreen(AppContext appContext, String username) {
+    public WelcomeScreen(AppContext appContext) {
         this.appContext = appContext;
         this.stage = appContext.stage;
-        this.username = username;
     }
 
     public void show() {
@@ -34,7 +32,7 @@ public class WelcomeScreen {
         Label welcomeLabel = new Label("Welcome!");
         welcomeLabel.setFont(Font.font("Times New Roman", FontWeight.BOLD, 60));
 
-        Label usernameRow = new Label("Logged in as: " + username);
+        Label usernameRow = new Label("Logged in as: " + appContext.account.getUserName());
         usernameRow.setFont(Font.font("Times New Roman", 40));
 
         Button openDashboardButton = new Button("Open Parking Dashboard");
@@ -58,8 +56,11 @@ public class WelcomeScreen {
 
 //        --------------Controls------------
 
-        openDashboardButton.setOnAction(e -> new ParkingLotDashboard(appContext, username).show());
+        openDashboardButton.setOnAction(e -> new ParkingLotDashboard(appContext).show());
 
-        logOutButton.setOnAction(e -> {new LoginWindow(appContext).show();});
+        logOutButton.setOnAction(_ -> {
+            appContext.setAccount(null);
+            new LoginWindow(appContext).show();
+        });
     }
 }
