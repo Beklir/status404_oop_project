@@ -37,13 +37,20 @@ public class APIManager {
         return restTemplate.getForObject(serverAddress + "/health", String.class);
     }
 
-    public Account login(String username, String password) {
+    public Account login(String username, String password) throws Exception{
         String url = UriComponentsBuilder.fromUriString(serverAddress + "/api/accounts/login")
                 .queryParam("user", username)
                 .queryParam("pass", password)
                 .toUriString();
 
-        return restTemplate.postForObject(url, null, Account.class);
+        try {
+            return restTemplate.postForObject(url, null, Account.class);
+        } catch (org.springframework.web.client.HttpClientErrorException.Unauthorized e) {
+            return null;
+        } catch (Exception e) {
+            System.err.println("Connection error: " + e.getMessage());
+            throw e;
+        }
     }
 
     // 3. Get Parking Lot Status

@@ -1,5 +1,6 @@
 package parkinglot.ui.login_system;
 
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -12,6 +13,7 @@ import javafx.scene.text.*;
 import javafx.stage.Stage;
 import parkinglot.managers.AppContext;
 import parkinglot.server.ServerUI;
+import parkinglot.users.Account;
 
 import java.util.Objects;
 
@@ -27,7 +29,7 @@ public class LoginWindow {
         this.appContext = appContext;
         this.stage = appContext.stage;
         ipField.setText(appContext.apiManager.getServerAddress().ip);
-        ipField.setText(String.valueOf(appContext.apiManager.getServerAddress().port));
+        portField.setText(String.valueOf(appContext.apiManager.getServerAddress().port));
     }
 
     public void show() {
@@ -85,29 +87,43 @@ public class LoginWindow {
             String username = usernameField.getText().trim();
             String password = passwordField.getText();
 
-            boolean authenticated = false;
-
-            for (User user: Database.loadUsers()){
-                if (user.username().equals(username) && user.password().equals(password)) {
-                    authenticated = true;
-                    break;
-                }
-            }
-
             if (username.isEmpty() || password.isEmpty()) {
                 loginLabel.setText("Please enter username and password.");
                 loginLabel.setTextFill(Color.RED);
                 return;
             }
 
-            if (authenticated) {
-                new WelcomeScreen(appContext, username).show();
-            } else {
-                loginLabel.setText("Incorrect username or password.");
-                loginLabel.setTextFill(Color.RED);
-            }
-        });
+            new Thread(() -> {
+                Platform.runLater(() -> {
+                    loginLabel.setText("Logging in...");
+                    loginLabel.setTextFill(Color.BLACK);
+                });
 
+                boolean authenticated = false;
+                try {
+                    Account account = appContext.apiManager.login(username, password);
+                    authenticated = account != null;
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    Platform.runLater(() -> {
+                        loginLabel.setText("Unable to connect to the server.");
+                        loginLabel.setTextFill(Color.RED);
+                    });
+                    return;
+                }
+
+
+                if (authenticated) {
+                    Platform.runLater(() -> new WelcomeScreen(appContext, username).show());
+                } else {
+                    Platform.runLater(() -> {
+                        loginLabel.setText("Incorrect username or password.");
+                        loginLabel.setTextFill(Color.RED);
+                    });
+                }
+
+            }).start();
+        });
 
         registerLink.setOnAction(e -> new RegistrationWindow(appContext).show()); //
     }

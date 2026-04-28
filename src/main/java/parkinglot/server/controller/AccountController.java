@@ -18,11 +18,10 @@ public class AccountController {
     @Autowired
     private AccountRepository accountRepo;
 
-    // 1. Simple Login Logic
     @PostMapping("/login")
     public ResponseEntity<Account> login(@RequestParam String user, @RequestParam String pass) {
         return accountRepo.findById(user)
-                .filter(acc -> acc.login(user, pass)) // Uses the logic in your Account class
+                .filter(acc -> acc.login(user, pass))
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
     }
