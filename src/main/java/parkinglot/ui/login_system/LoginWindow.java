@@ -35,6 +35,72 @@ public class LoginWindow {
     public void show() {
         stage.setTitle("Login");
 
+        Node topRight = getTopRightPane();
+        StackPane root = new StackPane();
+        root.setPadding(new Insets(20, 40, 40, 40));
+
+        if (appContext.apiManager.isLoggedIn()) {
+            showAutoLoginState(root, topRight);
+        } else {
+            showStandardLoginState(root, topRight);
+        }
+
+        Scene scene = new Scene(root, 460, 440);
+        Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/login_icon.png")));
+        stage.getIcons().setAll(icon);
+        stage.setScene(scene);
+        stage.setResizable(false);
+        stage.show();
+    }
+
+    private void showAutoLoginState(StackPane root, Node topRight) {
+        Label statusLabel = new Label("Restoring session...");
+        statusLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+        ProgressIndicator progress = new ProgressIndicator();
+
+        VBox loadingBox = new VBox(20, statusLabel, progress);
+        loadingBox.setAlignment(Pos.CENTER);
+
+        root.getChildren().setAll(loadingBox, topRight);
+        StackPane.setAlignment(topRight, Pos.TOP_RIGHT);
+
+        autoLogin(root, statusLabel, loadingBox, topRight);
+    }
+
+    private void autoLogin(StackPane root, Label statusLabel, VBox loadingBox, Node topRight) {
+        new Thread(() -> {
+            try {
+                Account account = appContext.apiManager.getCurrentAccount();
+                if (account != null) {
+                    appContext.setAccount(account);
+                    Platform.runLater(() -> new WelcomeScreen(appContext).show());
+                } else {
+                    throw new Exception("Session expired or invalid.");
+                }
+            } catch (Exception ex) {
+                Platform.runLater(() -> {
+                    statusLabel.setText("Failed to restore session.");
+                    statusLabel.setTextFill(Color.RED);
+                    loadingBox.getChildren().remove(1); // Remove progress indicator
+
+                    Button retryBtn = new Button("Try Again");
+                    retryBtn.setOnAction(e -> showAutoLoginState(root, topRight));
+
+                    Button logoutBtn = new Button("Log Out");
+                    logoutBtn.setOnAction(e -> {
+                        appContext.logOut();
+                        showStandardLoginState(root, topRight);
+                    });
+
+                    HBox actions = new HBox(10, retryBtn, logoutBtn);
+                    actions.setAlignment(Pos.CENTER);
+                    loadingBox.getChildren().add(actions);
+                });
+            }
+        }).start();
+    }
+
+    private void showStandardLoginState(StackPane root, Node topRight) {
         Label loginLabel = new Label("Enter your Username and Password");
         loginLabel.setAlignment(Pos.CENTER);
         loginLabel.setFont(Font.font("Arial", FontWeight.BOLD, 15));
@@ -69,23 +135,8 @@ public class LoginWindow {
         card.setAlignment(Pos.CENTER);
         card.setPadding(new Insets(56, 40, 36, 40));
 
-        Node topRight = getTopRightPane();
-
-        StackPane root = new StackPane(card, topRight);
+        root.getChildren().setAll(card, topRight);
         StackPane.setAlignment(topRight, Pos.TOP_RIGHT);
-        root.setPadding(new Insets(20, 40,40,40));
-
-
-        Scene scene = new Scene(root, 460, 440);
-
-        Image icon = new  Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/login_icon.png")));
-
-        stage.getIcons().setAll(icon);
-        stage.setScene(scene);
-        stage.setResizable(false);
-        stage.show();
-
-//        ------------------Controls---------------------
 
         loginButton.setOnAction(e -> {
             String username = usernameField.getText().trim();
@@ -124,7 +175,6 @@ public class LoginWindow {
                     return;
                 }
 
-
                 if (authenticated) {
                     Platform.runLater(() -> new WelcomeScreen(appContext).show());
                 } else {
@@ -138,7 +188,7 @@ public class LoginWindow {
             }).start();
         });
 
-        registerLink.setOnAction(e -> new RegistrationWindow(appContext).show()); //
+        registerLink.setOnAction(e -> new RegistrationWindow(appContext).show());
     }
 
     private Pane getTopRightPane() {

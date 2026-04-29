@@ -60,6 +60,10 @@ public class APIManager {
         saveTokenToFile(null);
     }
 
+    public boolean isLoggedIn() {
+        return authToken != null && !authToken.isEmpty();
+    }
+
     // 1. Health Check
     public String checkHealth() {
         return restTemplate.getForObject(serverAddress + "/health", String.class);
