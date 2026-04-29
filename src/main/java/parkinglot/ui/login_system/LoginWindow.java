@@ -50,9 +50,13 @@ public class LoginWindow {
 
         Hyperlink registerLink = new Hyperlink("Don't have an account? Register here");
 
+        CheckBox rememberMeCheckBox = new CheckBox("Remember me");
+        rememberMeCheckBox.setSelected(true);
+
         VBox formBox = new VBox(6,
                 usernameLabel, usernameField,
-                passwordLabel, passwordField
+                passwordLabel, passwordField,
+                rememberMeCheckBox
         );
         formBox.setPadding(new Insets(0, 0, 10, 0));
 
@@ -95,10 +99,11 @@ public class LoginWindow {
             loginButton.setDisable(true);
             loginLabel.setText("Logging in...");
             loginLabel.setTextFill(Color.BLACK);
+            boolean rememberMe = rememberMeCheckBox.isSelected();
             new Thread(() -> {
                 boolean authenticated = false;
                 try {
-                    Account account = appContext.apiManager.login(username, password).user();
+                    Account account = appContext.apiManager.login(username, password, rememberMe).user();
                     authenticated = account != null;
                     appContext.setAccount(account);
                 } catch (Exception ex) {

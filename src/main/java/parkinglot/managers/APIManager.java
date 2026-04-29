@@ -9,6 +9,7 @@ import parkinglot.constants.VehicleType;
 import parkinglot.models.ParkingLot;
 import parkinglot.models.ParkingTicket;
 import parkinglot.users.Account;
+import parkinglot.users.Person;
 import parkinglot.utils.LoginResponse;
 
 public class APIManager {
@@ -18,10 +19,12 @@ public class APIManager {
 
     public APIManager(String ip, int port){
         setServerAddress(ip, port);
+        loadTokenFromFile();
     }
 
     public APIManager(){
         setServerAddress("127.0.0.1",8080);
+        loadTokenFromFile();
     }
 
     public void setServerAddress(String ip, int port){
@@ -37,7 +40,10 @@ public class APIManager {
 
     public ServerAddress getServerAddress() {return serverAddress;}
 
-    public void clearToken(){this.authToken = null;}
+    public void clearToken(){
+        this.authToken = null;
+        saveTokenToFile(null);
+    }
 
     private HttpEntity<Void> getAuthHeaders() {
         HttpHeaders headers = new HttpHeaders();
@@ -50,7 +56,7 @@ public class APIManager {
         return restTemplate.getForObject(serverAddress + "/health", String.class);
     }
 
-    public LoginResponse login(String username, String password) throws Exception{
+    public LoginResponse login(String username, String password, boolean rememberMe) throws Exception{
         String url = UriComponentsBuilder.fromUriString(serverAddress + "/api/accounts/login")
                 .queryParam("user", username)
                 .queryParam("pass", password)
@@ -60,6 +66,11 @@ public class APIManager {
             LoginResponse response = restTemplate.postForObject(url, null, LoginResponse.class);
             if (response != null) {
                 this.authToken = response.token();
+                if (rememberMe) {
+                    saveTokenToFile(this.authToken);
+                } else {
+                    saveTokenToFile(null);
+                }
             }
             return response;
         } catch (org.springframework.web.client.HttpClientErrorException.Unauthorized e) {
@@ -121,5 +132,29 @@ public class APIManager {
                 .toUriString();
 
         return restTemplate.postForObject(url, null, ParkingTicket.class);
+    }
+
+    public void loadTokenFromFile() {
+        try {
+            java.nio.file.Path path = java.nio.file.Paths.get("token.txt");
+            if (java.nio.file.Files.exists(path)) {
+                String token = java.nio.file.Files.readString(path).trim();
+                if (!token.isEmpty()) {
+                    this.authToken = token;
+                }
+            }
+        } catch (java.io.IOException e) {
+            System.err.println("Could not load token from file: " + e.getMessage());
+        }
+    }
+
+    private void saveTokenToFile(String token) {
+        try (java.io.PrintWriter out = new java.io.PrintWriter("token.txt")) {
+            if (token != null) {
+                out.print(token);
+            }
+        } catch (java.io.FileNotFoundException e) {
+            System.err.println("Could not save token to file: " + e.getMessage());
+        }
     }
 }
