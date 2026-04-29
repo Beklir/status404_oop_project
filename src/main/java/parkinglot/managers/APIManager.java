@@ -22,13 +22,15 @@ public class APIManager {
     private final RestTemplate restTemplate = new RestTemplate();
 
     public APIManager(String ip, int port){
-        setServerAddress(ip, port);
+        this.serverAddress = new ServerAddress(ip, port);
+        loadServerConfig();
         loadTokenFromFile();
         setupInterceptors();
     }
 
     public APIManager(){
-        setServerAddress("127.0.0.1",8080);
+        this.serverAddress = new ServerAddress("127.0.0.1", 8080);
+        loadServerConfig();
         loadTokenFromFile();
         setupInterceptors();
     }
@@ -44,6 +46,7 @@ public class APIManager {
 
     public void setServerAddress(String ip, int port){
         serverAddress = new ServerAddress(ip, port);
+        saveServerConfig();
     }
 
     public void setServerIp(String ip){
@@ -171,6 +174,31 @@ public class APIManager {
             }
         } catch (java.io.FileNotFoundException e) {
             System.err.println("Could not save token to file: " + e.getMessage());
+        }
+    }
+
+    public void loadServerConfig() {
+        try {
+            System.out.println("Loading server config");
+            java.nio.file.Path path = java.nio.file.Paths.get("server_config.txt");
+            if (java.nio.file.Files.exists(path)) {
+                String content = java.nio.file.Files.readString(path).trim();
+                String[] parts = content.split(":");
+                if (parts.length == 2) {
+                    this.serverAddress = new ServerAddress(parts[0], Integer.parseInt(parts[1]));
+                    System.out.println("Loaded: "+ this.serverAddress);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Could not load server config: " + e.getMessage());
+        }
+    }
+
+    private void saveServerConfig() {
+        try (java.io.PrintWriter out = new java.io.PrintWriter("server_config.txt")) {
+            out.print(serverAddress.ip + ":" + serverAddress.port);
+        } catch (java.io.FileNotFoundException e) {
+            System.err.println("Could not save server config: " + e.getMessage());
         }
     }
 }
