@@ -70,6 +70,16 @@ public class APIManager {
         }
     }
 
+    public void register(Account account) throws Exception {
+        try {
+            restTemplate.postForEntity(serverAddress + "/api/accounts/register", account, String.class);
+        } catch (org.springframework.web.client.HttpStatusCodeException e) {
+            throw new Exception(e.getResponseBodyAsString());
+        } catch (Exception e) {
+            throw new Exception("Connection error: " + e.getMessage());
+        }
+    }
+
     // 3. Get Parking Lot Status
     public ParkingLot getStatus() {
         // Use exchange instead of getForObject to send headers

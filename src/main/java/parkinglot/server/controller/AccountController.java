@@ -40,6 +40,19 @@ public class AccountController {
         return accountRepo.save(attendant);
     }
 
+    @PostMapping("/register")
+    public ResponseEntity<String> register(@RequestBody Account account) {
+        if (accountRepo.existsById(account.getUserName())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists");
+        }
+        try {
+            accountRepo.save(account);
+            return ResponseEntity.ok("Registration successful");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error creating account: " + e.getMessage());
+        }
+    }
+
     // 3. List all accounts (For Admin Dashboard)
     @GetMapping("/all")
     public List<Account> getAll() {
