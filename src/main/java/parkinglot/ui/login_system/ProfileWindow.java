@@ -99,7 +99,7 @@ public class ProfileWindow {
 
         // Layout
         Button backBtn = new Button("← Back");
-        backBtn.setOnAction(e -> new WelcomeScreen(appContext).show());
+        backBtn.setOnAction(e -> appContext.goBack("Management Portal", 1000, 700, true));
 
         HBox mainContent = new HBox(30, personBox, passwordBox);
         mainContent.setAlignment(Pos.CENTER);
@@ -108,9 +108,7 @@ public class ProfileWindow {
         root.setPadding(new Insets(30));
         root.setAlignment(Pos.TOP_CENTER);
 
-        Scene scene = new Scene(root, 750, 650);
-        stage.setScene(scene);
-        stage.show();
+        appContext.pushView(root, "My Profile", 750, 650, true);
 
         // --- Actions ---
         updatePersonBtn.setOnAction(e -> {

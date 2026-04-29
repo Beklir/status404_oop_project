@@ -44,10 +44,7 @@ public class AdminWindow {
         root.setTop(topBar);
         root.setPadding(new Insets(0, 0, 10, 0));
 
-        Scene scene = new Scene(root, 1000, 700);
-        stage.setScene(scene);
-        stage.setResizable(true);
-        stage.show();
+        appContext.resetToView(root, "Admin Panel - Parking Lot System", 1000, 700, true);
     }
 
     private Node createPlaceholder(String text) {

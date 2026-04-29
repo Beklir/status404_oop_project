@@ -83,7 +83,7 @@ public class ParkingLotDashboard {
         ticketsArea.setPromptText("Active tickets will appear here...");
 
         Button backButton = new Button("Back");
-        backButton.setOnAction(e -> new WelcomeScreen(appContext).show());
+        backButton.setOnAction(e -> appContext.goBack("Welcome", 460, 440, false));
 
         VBox root = new VBox(
                 12,
@@ -99,15 +99,7 @@ public class ParkingLotDashboard {
         root.setAlignment(Pos.TOP_LEFT);
         root.setPadding(new Insets(16));
 
-
-        Scene scene = new Scene(root, 960, 640);
-
-        Image icon = new  Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/parking_icon.png")));
-
-        stage.getIcons().setAll(icon);
-        stage.setScene(scene);
-        stage.setResizable(true);
-        stage.show();
+        appContext.pushView(root, "Parking Lot Dashboard", 960, 640, true);
     }
 
     private VBox buildEntryCard() {
