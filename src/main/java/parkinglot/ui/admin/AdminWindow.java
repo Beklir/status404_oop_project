@@ -27,9 +27,9 @@ public class AdminWindow {
 
         TabPane tabPane = new TabPane();
         
-        // Boilerplate tabs
+        // Real tabs
         Tab dashboardTab = new Tab("Dashboard", createPlaceholder("Dashboard Content Overview"));
-        Tab floorTab = new Tab("Floors", createPlaceholder("Floor & Spot Management"));
+        Tab floorTab = new Tab("Floors", new FloorManagerTab(appContext).getContent());
         Tab attendantTab = new Tab("Attendants", createPlaceholder("Parking Attendant Management"));
         Tab rateTab = new Tab("Rates", createPlaceholder("Parking Rate Configuration"));
 
