@@ -45,6 +45,27 @@ public class AdminWindow {
         root.setPadding(new Insets(0, 0, 10, 0));
 
         appContext.resetToView(root, "Admin Panel - Parking Lot System", 1000, 700, true);
+        
+        // Initial data fetch
+        refreshData();
+    }
+
+    private void refreshData() {
+        new Thread(() -> {
+            try {
+                parkinglot.models.ParkingLot lot = appContext.apiManager.getStatus();
+                javafx.application.Platform.runLater(() -> appContext.setParkingLot(lot));
+            } catch (Exception e) {
+                e.printStackTrace();
+                javafx.application.Platform.runLater(() -> {
+                    javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
+                    alert.setTitle("Synchronization Error");
+                    alert.setHeaderText("Failed to fetch parking lot status");
+                    alert.setContentText(e.getMessage());
+                    alert.show();
+                });
+            }
+        }).start();
     }
 
     private Node createPlaceholder(String text) {

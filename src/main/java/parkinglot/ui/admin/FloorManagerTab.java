@@ -18,7 +18,6 @@ import java.util.List;
 
 public class FloorManagerTab {
     private final AppContext appContext;
-    private ParkingLot parkingLot;
 
     public FloorManagerTab(AppContext appContext) {
         this.appContext = appContext;
@@ -103,42 +102,35 @@ public class FloorManagerTab {
         splitPane.getItems().addAll(floorListContainer, spotContainer);
         splitPane.setDividerPositions(0.3);
 
-        // --- Logic: Data Loading & Selection ---
+        // --- Logic: Data Observation & Selection ---
+        appContext.parkingLotProperty().addListener((obs, oldLot, newLot) -> {
+            if (newLot != null) {
+                Platform.runLater(() -> updateFloorList(floorListView, newLot));
+            }
+        });
+
+        // Initialize if data already exists
+        if (appContext.getParkingLot() != null) {
+            updateFloorList(floorListView, appContext.getParkingLot());
+        }
+
         floorListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null && parkingLot != null) {
-                parkingLot.getFloors().stream()
+            if (newVal != null && appContext.getParkingLot() != null) {
+                appContext.getParkingLot().getFloors().stream()
                         .filter(f -> f.getName().equals(newVal))
                         .findFirst()
                         .ifPresent(floor -> spotTable.setItems(FXCollections.observableArrayList(floor.getSpots())));
             }
         });
 
-        loadData(floorListView);
-
         return splitPane;
     }
 
-    private void loadData(ListView<String> floorListView) {
-        new Thread(() -> {
-            try {
-                this.parkingLot = appContext.apiManager.getStatus();
-                List<String> floorNames = parkingLot.getFloors().stream()
-                        .map(ParkingFloor::getName)
-                        .toList();
-
-                Platform.runLater(() -> {
-                    floorListView.setItems(FXCollections.observableArrayList(floorNames));
-                    if (!floorNames.isEmpty()) {
-                        floorListView.getSelectionModel().select(0);
-                    }
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
-                Platform.runLater(() -> {
-                    Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to load floor data: " + e.getMessage());
-                    alert.show();
-                });
-            }
-        }).start();
+    private void updateFloorList(ListView<String> floorListView, ParkingLot lot) {
+        List<String> names = lot.getFloors().stream().map(ParkingFloor::getName).toList();
+        floorListView.setItems(FXCollections.observableArrayList(names));
+        if (floorListView.getSelectionModel().getSelectedIndex() < 0 && !names.isEmpty()) {
+            floorListView.getSelectionModel().select(0);
+        }
     }
 }
