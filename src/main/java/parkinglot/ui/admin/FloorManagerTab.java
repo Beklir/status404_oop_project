@@ -9,8 +9,16 @@ import parkinglot.constants.ParkingSpotType;
 import parkinglot.managers.AppContext;
 import parkinglot.models.spots.ParkingSpot;
 
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import parkinglot.models.ParkingFloor;
+import parkinglot.models.ParkingLot;
+
+import java.util.List;
+
 public class FloorManagerTab {
     private final AppContext appContext;
+    private ParkingLot parkingLot;
 
     public FloorManagerTab(AppContext appContext) {
         this.appContext = appContext;
@@ -29,9 +37,7 @@ public class FloorManagerTab {
         floorListTitle.setStyle("-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #333;");
 
         ListView<String> floorListView = new ListView<>();
-        // Dummy data for design preview
-        floorListView.getItems().addAll("Floor 1", "Floor 2", "Floor 3 (Full)");
-        floorListView.setPrefHeight(400);
+        VBox.setVgrow(floorListView, Priority.ALWAYS);
 
         TextField newFloorField = new TextField();
         newFloorField.setPromptText("Floor Name (e.g. Ground Floor)");
@@ -42,7 +48,7 @@ public class FloorManagerTab {
         
         Button deleteFloorBtn = new Button("Delete Selected Floor");
         deleteFloorBtn.setMaxWidth(Double.MAX_VALUE);
-        deleteFloorBtn.setStyle("-fx-text-fill: #d9534f;"); // Reddish for danger
+        deleteFloorBtn.setStyle("-fx-text-fill: #d9534f;");
 
         floorListContainer.getChildren().addAll(floorListTitle, floorListView, new Separator(), newFloorField, addFloorBtn, deleteFloorBtn);
 
@@ -58,15 +64,12 @@ public class FloorManagerTab {
         
         TableColumn<ParkingSpot, String> numCol = new TableColumn<>("Spot #");
         numCol.setCellValueFactory(new PropertyValueFactory<>("number"));
-        numCol.setPrefWidth(100);
         
         TableColumn<ParkingSpot, String> typeCol = new TableColumn<>("Spot Type");
         typeCol.setCellValueFactory(new PropertyValueFactory<>("type"));
-        typeCol.setPrefWidth(150);
         
-        TableColumn<ParkingSpot, Boolean> statusCol = new TableColumn<>("Status (Free)");
+        TableColumn<ParkingSpot, Boolean> statusCol = new TableColumn<>("Is Free");
         statusCol.setCellValueFactory(new PropertyValueFactory<>("free"));
-        statusCol.setPrefWidth(100);
 
         spotTable.getColumns().addAll(numCol, typeCol, statusCol);
         spotTable.setPlaceholder(new Label("Select a floor to view spots"));
@@ -84,7 +87,6 @@ public class FloorManagerTab {
 
         ComboBox<ParkingSpotType> typeCombo = new ComboBox<>();
         typeCombo.getItems().addAll(ParkingSpotType.values());
-        typeCombo.setPromptText("Select Type");
         typeCombo.getSelectionModel().select(ParkingSpotType.COMPACT);
 
         Button addSpotBtn = new Button("Add Spot");
@@ -101,6 +103,42 @@ public class FloorManagerTab {
         splitPane.getItems().addAll(floorListContainer, spotContainer);
         splitPane.setDividerPositions(0.3);
 
+        // --- Logic: Data Loading & Selection ---
+        floorListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && parkingLot != null) {
+                parkingLot.getFloors().stream()
+                        .filter(f -> f.getName().equals(newVal))
+                        .findFirst()
+                        .ifPresent(floor -> spotTable.setItems(FXCollections.observableArrayList(floor.getSpots())));
+            }
+        });
+
+        loadData(floorListView);
+
         return splitPane;
+    }
+
+    private void loadData(ListView<String> floorListView) {
+        new Thread(() -> {
+            try {
+                this.parkingLot = appContext.apiManager.getStatus();
+                List<String> floorNames = parkingLot.getFloors().stream()
+                        .map(ParkingFloor::getName)
+                        .toList();
+
+                Platform.runLater(() -> {
+                    floorListView.setItems(FXCollections.observableArrayList(floorNames));
+                    if (!floorNames.isEmpty()) {
+                        floorListView.getSelectionModel().select(0);
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+                Platform.runLater(() -> {
+                    Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to load floor data: " + e.getMessage());
+                    alert.show();
+                });
+            }
+        }).start();
     }
 }
