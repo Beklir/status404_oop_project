@@ -16,7 +16,8 @@ import parkinglot.constants.AccountStatus;
 )
 @JsonSubTypes({
         @JsonSubTypes.Type(value = Admin.class, name = "ADMIN"),
-        @JsonSubTypes.Type(value = ParkingAttendant.class, name = "ATTENDANT")
+        @JsonSubTypes.Type(value = ParkingAttendant.class, name = "ATTENDANT"),
+        @JsonSubTypes.Type(value = Customer.class, name = "CUSTOMER")
 })
 public abstract class Account {
 

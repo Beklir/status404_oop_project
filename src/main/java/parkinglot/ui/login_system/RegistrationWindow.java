@@ -1,5 +1,6 @@
 package parkinglot.ui.login_system;
 
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -12,6 +13,9 @@ import parkinglot.managers.AppContext;
 
 import java.io.IOException;
 import java.util.Objects;
+import parkinglot.users.Customer;
+import parkinglot.users.Person;
+import parkinglot.models.Location;
 
 
 public class RegistrationWindow{
@@ -87,29 +91,32 @@ public class RegistrationWindow{
             String password = passwordField.getText();
             String confirm = confirmPasswordField.getText();
 
-            boolean userExists = false;
-
-            for (User user: Database.loadUsers()){
-                if (user.username().equals(username)) {
-                    userExists = true;
-                    break;
-                }
-            }
-
-
             if (username.isEmpty() || email.isEmpty() || password.isEmpty()) {
                 registerLabel.setText("Fields cannot be empty!");
-            }else if (!password.equals(confirm)) {
+            } else if (!password.equals(confirm)) {
                 registerLabel.setText("Passwords do not match!");
-            }else if (userExists){
-                registerLabel.setText("Account already exists!");
-            }else {
-                try {
-                    Database.saveUser(new User(username, password, email));
-                    new LoginWindow(appContext).show();
-                } catch (IOException ex) {
-                    registerLabel.setText("Error saving user.");
-                }
+            } else {
+                registerButton.setDisable(true);
+                registerLabel.setText("Registering...");
+
+                new Thread(() -> {
+                    try {
+                        Location location = new Location("", "", "", "", "");
+                        Person person = new Person(username, location, email, "");
+                        Customer customer = new Customer(username, password, person);
+                        
+                        appContext.apiManager.register(customer);
+
+                        Platform.runLater(() -> {
+                            new LoginWindow(appContext).show();
+                        });
+                    } catch (Exception ex) {
+                        Platform.runLater(() -> {
+                            registerLabel.setText(ex.getMessage());
+                            registerButton.setDisable(false);
+                        });
+                    }
+                }).start();
             }
         });
 

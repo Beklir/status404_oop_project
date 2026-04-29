@@ -92,13 +92,10 @@ public class LoginWindow {
                 loginLabel.setTextFill(Color.RED);
                 return;
             }
-
+            loginButton.setDisable(true);
+            loginLabel.setText("Logging in...");
+            loginLabel.setTextFill(Color.BLACK);
             new Thread(() -> {
-                Platform.runLater(() -> {
-                    loginLabel.setText("Logging in...");
-                    loginLabel.setTextFill(Color.BLACK);
-                });
-
                 boolean authenticated = false;
                 try {
                     Account account = appContext.apiManager.login(username, password).user();
@@ -110,6 +107,7 @@ public class LoginWindow {
                         loginLabel.setText("Unable to connect to the server.");
                         loginLabel.setTextFill(Color.RED);
                     });
+                    loginButton.setDisable(false);
                     return;
                 }
 
@@ -120,6 +118,7 @@ public class LoginWindow {
                     Platform.runLater(() -> {
                         loginLabel.setText("Incorrect username or password.");
                         loginLabel.setTextFill(Color.RED);
+                        loginButton.setDisable(false);
                     });
                 }
 
