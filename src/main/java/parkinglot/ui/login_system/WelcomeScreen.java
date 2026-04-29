@@ -46,14 +46,7 @@ public class WelcomeScreen {
         StackPane root = new StackPane(infoCard);
         root.setPadding(new Insets(16));
 
-        Scene scene = new Scene(root,460,440);
-
-        Image icon = new  Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/parking_icon.png")));
-
-        stage.getIcons().setAll(icon);
-        stage.setScene(scene);
-        stage.setResizable(false);
-        stage.show();
+        appContext.resetToView(root, "Welcome", 460, 440, false);
 
 //        --------------Controls------------
 

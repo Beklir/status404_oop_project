@@ -30,7 +30,11 @@ public class AccountController {
         return accountRepo.findById(user)
                 .filter(acc -> acc.login(user, pass))
                 .map(acc -> {
-                    String token = jwtService.generateToken(acc.getUserName());
+                    String role = "ROLE_USER";
+                    if (acc instanceof parkinglot.users.Admin) role = "ROLE_ADMIN";
+                    else if (acc instanceof parkinglot.users.ParkingAttendant) role = "ROLE_ATTENDANT";
+                    
+                    String token = jwtService.generateToken(acc.getUserName(), role);
                     return ResponseEntity.ok(new LoginResponse(token, acc));
                 })
                 .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());

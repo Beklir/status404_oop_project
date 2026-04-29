@@ -6,7 +6,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import parkinglot.constants.ParkingSpotType;
 import parkinglot.constants.VehicleType;
+import parkinglot.models.ParkingFloor;
 import parkinglot.models.ParkingLot;
 import parkinglot.models.ParkingTicket;
 import parkinglot.users.Account;
@@ -151,6 +153,31 @@ public class APIManager {
                 .toUriString();
 
         return restTemplate.postForObject(url, null, ParkingTicket.class);
+    }
+
+    // --- Admin Parking Management ---
+
+    public void addFloor(String name) {
+        String url = UriComponentsBuilder.fromUriString(serverAddress + "/api/parking/floors")
+                .queryParam("name", name)
+                .toUriString();
+        restTemplate.postForObject(url, null, ParkingFloor.class);
+    }
+
+    public void deleteFloor(String name) {
+        restTemplate.delete(serverAddress + "/api/parking/floors/" + name);
+    }
+
+    public void addSpot(String floorName, String number, ParkingSpotType type) {
+        String url = UriComponentsBuilder.fromUriString(serverAddress + "/api/parking/floors/" + floorName + "/spots")
+                .queryParam("number", number)
+                .queryParam("type", type)
+                .toUriString();
+        restTemplate.postForObject(url, null, Void.class);
+    }
+
+    public void deleteSpot(String floorName, String spotNumber) {
+        restTemplate.delete(serverAddress + "/api/parking/floors/" + floorName + "/spots/" + spotNumber);
     }
 
     public void loadTokenFromFile() {

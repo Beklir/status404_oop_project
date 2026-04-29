@@ -16,8 +16,13 @@ public class JwtService {
     private static final long EXPIRATION_TIME = 365L *24*60*60*1000;
 
     public String generateToken(String username) {
+        return generateToken(username, "ROLE_USER");
+    }
+
+    public String generateToken(String username, String role) {
         return Jwts.builder()
                 .subject(username)
+                .claim("role", role)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(SECRET_KEY)
@@ -31,6 +36,15 @@ public class JwtService {
                 .parseSignedClaims(token)
                 .getPayload()
                 .getSubject();
+    }
+
+    public String extractRole(String token) {
+        return Jwts.parser()
+                .verifyWith(SECRET_KEY)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("role", String.class);
     }
 
     public boolean isTokenValid(String token) {

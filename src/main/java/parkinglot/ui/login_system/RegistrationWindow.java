@@ -73,14 +73,7 @@ public class RegistrationWindow{
         root.setPadding(new Insets(40));
 
 
-        Scene scene = new Scene(root, 460, 440);
-
-        Image icon = new  Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/login_icon.png")));
-
-        stage.getIcons().setAll(icon);
-        stage.setScene(scene);
-        stage.setResizable(false);
-        stage.show();
+        appContext.pushView(root, "Registration", 460, 440, false);
 
 //        -----------------Controls----------------
 
@@ -108,7 +101,7 @@ public class RegistrationWindow{
                         appContext.apiManager.register(customer);
 
                         Platform.runLater(() -> {
-                            new LoginWindow(appContext).show();
+                            appContext.goBack("Login", 460, 440, false);
                         });
                     } catch (Exception ex) {
                         Platform.runLater(() -> {
@@ -121,6 +114,6 @@ public class RegistrationWindow{
         });
 
 
-        loginLink.setOnAction(e -> new LoginWindow(appContext).show());
+        loginLink.setOnAction(e -> appContext.goBack("Login", 460, 440, false));
     }
 }
