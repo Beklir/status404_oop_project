@@ -11,6 +11,7 @@ import parkinglot.server.repository.AccountRepository;
 import parkinglot.users.Person;
 import parkinglot.utils.LoginResponse;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -63,6 +64,14 @@ public class AccountController {
                     return ResponseEntity.ok("Person details updated successfully");
                 })
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found"));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<Account> getCurrentAccount(Principal principal) {
+        if (principal == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        return accountRepo.findById(principal.getName())
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
     // 3. List all accounts (For Admin Dashboard)

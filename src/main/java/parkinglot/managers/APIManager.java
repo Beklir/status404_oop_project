@@ -93,6 +93,15 @@ public class APIManager {
         }
     }
 
+    public Account getCurrentAccount() {
+        return restTemplate.exchange(
+                serverAddress + "/api/accounts/me",
+                HttpMethod.GET,
+                getAuthHeaders(),
+                Account.class
+        ).getBody();
+    }
+
     // 3. Get Parking Lot Status
     public ParkingLot getStatus() {
         // Use exchange instead of getForObject to send headers
