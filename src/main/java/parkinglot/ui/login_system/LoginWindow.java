@@ -103,16 +103,24 @@ public class LoginWindow {
             new Thread(() -> {
                 boolean authenticated = false;
                 try {
-                    Account account = appContext.apiManager.login(username, password, rememberMe).user();
-                    authenticated = account != null;
+                    Account account = appContext.apiManager.login(username, password, rememberMe);
+                    if (account == null) {
+                        Platform.runLater(() -> {
+                            loginLabel.setText("Incorrect username or password.");
+                            loginLabel.setTextFill(Color.RED);
+                            loginButton.setDisable(false);
+                        });
+                        return;
+                    }
+                    authenticated = true;
                     appContext.setAccount(account);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     Platform.runLater(() -> {
                         loginLabel.setText("Unable to connect to the server.");
                         loginLabel.setTextFill(Color.RED);
+                        loginButton.setDisable(false);
                     });
-                    loginButton.setDisable(false);
                     return;
                 }
 

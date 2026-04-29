@@ -36,9 +36,10 @@ public class WelcomeScreen {
         usernameRow.setFont(Font.font("Times New Roman", 40));
 
         Button openDashboardButton = new Button("Open Parking Dashboard");
+        Button myProfileButton = new Button("My Profile");
         Button logOutButton = new Button("Log Out");
 
-        VBox infoCard = new VBox(20, welcomeLabel, usernameRow, openDashboardButton, logOutButton);
+        VBox infoCard = new VBox(20, welcomeLabel, usernameRow, openDashboardButton, myProfileButton, logOutButton);
         infoCard.setAlignment(Pos.CENTER);
         infoCard.setPadding(new Insets(16, 20, 16, 20));
 
@@ -57,6 +58,7 @@ public class WelcomeScreen {
 //        --------------Controls------------
 
         openDashboardButton.setOnAction(e -> new ParkingLotDashboard(appContext).show());
+        myProfileButton.setOnAction(e -> new ProfileWindow(appContext).show());
 
         logOutButton.setOnAction(_ -> {
             appContext.logOut();

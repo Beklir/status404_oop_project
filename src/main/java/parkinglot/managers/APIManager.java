@@ -3,6 +3,7 @@ package parkinglot.managers;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import parkinglot.constants.VehicleType;
@@ -12,6 +13,9 @@ import parkinglot.users.Account;
 import parkinglot.users.Person;
 import parkinglot.utils.LoginResponse;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class APIManager {
     private String authToken = null;
     private ServerAddress serverAddress;
@@ -20,11 +24,22 @@ public class APIManager {
     public APIManager(String ip, int port){
         setServerAddress(ip, port);
         loadTokenFromFile();
+        setupInterceptors();
     }
 
     public APIManager(){
         setServerAddress("127.0.0.1",8080);
         loadTokenFromFile();
+        setupInterceptors();
+    }
+
+    private void setupInterceptors() {
+        restTemplate.getInterceptors().add((request, body, execution) -> {
+            if (authToken != null && !authToken.isEmpty()) {
+                request.getHeaders().setBearerAuth(authToken);
+            }
+            return execution.execute(request, body);
+        });
     }
 
     public void setServerAddress(String ip, int port){
@@ -45,18 +60,12 @@ public class APIManager {
         saveTokenToFile(null);
     }
 
-    private HttpEntity<Void> getAuthHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(authToken);
-        return new HttpEntity<>(headers);
-    }
-
     // 1. Health Check
     public String checkHealth() {
         return restTemplate.getForObject(serverAddress + "/health", String.class);
     }
 
-    public LoginResponse login(String username, String password, boolean rememberMe) throws Exception{
+    public Account login(String username, String password, boolean rememberMe) throws Exception{
         String url = UriComponentsBuilder.fromUriString(serverAddress + "/api/accounts/login")
                 .queryParam("user", username)
                 .queryParam("pass", password)
@@ -71,8 +80,9 @@ public class APIManager {
                 } else {
                     saveTokenToFile(null);
                 }
+                return response.user();
             }
-            return response;
+            return null;
         } catch (org.springframework.web.client.HttpClientErrorException.Unauthorized e) {
             return null;
         } catch (Exception e) {
@@ -96,7 +106,7 @@ public class APIManager {
                 .queryParam("username", username)
                 .toUriString();
         try {
-            restTemplate.postForEntity(url, person, String.class);
+            restTemplate.postForObject(url, person, String.class);
         } catch (org.springframework.web.client.HttpStatusCodeException e) {
             throw new Exception(e.getResponseBodyAsString());
         } catch (Exception e) {
@@ -105,23 +115,25 @@ public class APIManager {
     }
 
     public Account getCurrentAccount() {
-        return restTemplate.exchange(
-                serverAddress + "/api/accounts/me",
-                HttpMethod.GET,
-                getAuthHeaders(),
-                Account.class
-        ).getBody();
+        return restTemplate.getForObject(serverAddress + "/api/accounts/me", Account.class);
+    }
+
+    public void changePassword(String newPassword) throws Exception {
+        String url = UriComponentsBuilder.fromUriString(serverAddress + "/api/accounts/change-password")
+                .queryParam("newPassword", newPassword)
+                .toUriString();
+        try {
+            restTemplate.postForObject(url, null, String.class);
+        } catch (org.springframework.web.client.HttpStatusCodeException e) {
+            throw new Exception(e.getResponseBodyAsString());
+        } catch (Exception e) {
+            throw new Exception("Connection error: " + e.getMessage());
+        }
     }
 
     // 3. Get Parking Lot Status
     public ParkingLot getStatus() {
-        // Use exchange instead of getForObject to send headers
-        return restTemplate.exchange(
-                serverAddress + "/api/parking/status",
-                HttpMethod.GET,
-                getAuthHeaders(),
-                ParkingLot.class
-        ).getBody();
+        return restTemplate.getForObject(serverAddress + "/api/parking/status", ParkingLot.class);
     }
 
     // 4. Vehicle Entry

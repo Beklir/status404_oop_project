@@ -68,6 +68,7 @@ public class ServerUI {
     public void show() {
         logArea = new TextArea();
         logArea.setEditable(false);
+        logArea.setStyle("-fx-font-family: 'monospace'; -fx-font-size: 12px;");
 
         // Redirect System.out to the TextArea
         PrintStream ps = new PrintStream(new ConsoleStream(logArea));

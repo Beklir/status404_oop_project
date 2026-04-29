@@ -74,6 +74,18 @@ public class AccountController {
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
+    @PostMapping("/change-password")
+    public ResponseEntity<String> changePassword(Principal principal, @RequestParam String newPassword) {
+        if (principal == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        return accountRepo.findById(principal.getName())
+                .map(acc -> {
+                    acc.setPassword(newPassword);
+                    accountRepo.save(acc);
+                    return ResponseEntity.ok("Password changed successfully");
+                })
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found"));
+    }
+
     // 3. List all accounts (For Admin Dashboard)
     @GetMapping("/all")
     public List<Account> getAll() {
