@@ -13,7 +13,9 @@ import javafx.scene.text.*;
 import javafx.stage.Stage;
 import parkinglot.managers.AppContext;
 import parkinglot.server.ServerUI;
+import parkinglot.ui.admin.AdminWindow;
 import parkinglot.users.Account;
+import parkinglot.users.Admin;
 
 import java.util.Objects;
 
@@ -45,12 +47,11 @@ public class LoginWindow {
             showStandardLoginState(root, topRight);
         }
 
-        Scene scene = new Scene(root, 460, 440);
+        appContext.resetToView(root, "Login", 460, 440, false);
+
+        // Add icon (only once or every time resetToView is called?)
         Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/login_icon.png")));
         stage.getIcons().setAll(icon);
-        stage.setScene(scene);
-        stage.setResizable(false);
-        stage.show();
     }
 
     private void showAutoLoginState(StackPane root, Node topRight) {
@@ -73,7 +74,13 @@ public class LoginWindow {
                 Account account = appContext.apiManager.getCurrentAccount();
                 if (account != null) {
                     appContext.setAccount(account);
-                    Platform.runLater(() -> new WelcomeScreen(appContext).show());
+                    Platform.runLater(() -> {
+                        if (account instanceof Admin) {
+                            new AdminWindow(appContext).show();
+                        } else {
+                            new WelcomeScreen(appContext).show();
+                        }
+                    });
                 } else {
                     throw new Exception("Session expired or invalid.");
                 }
@@ -176,7 +183,13 @@ public class LoginWindow {
                 }
 
                 if (authenticated) {
-                    Platform.runLater(() -> new WelcomeScreen(appContext).show());
+                    Platform.runLater(() -> {
+                        if (appContext.account instanceof Admin) {
+                            new AdminWindow(appContext).show();
+                        } else {
+                            new WelcomeScreen(appContext).show();
+                        }
+                    });
                 } else {
                     Platform.runLater(() -> {
                         loginLabel.setText("Incorrect username or password.");
