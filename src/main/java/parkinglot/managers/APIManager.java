@@ -80,6 +80,19 @@ public class APIManager {
         }
     }
 
+    public void updatePerson(String username, Person person) throws Exception {
+        String url = UriComponentsBuilder.fromUriString(serverAddress + "/api/accounts/update-person")
+                .queryParam("username", username)
+                .toUriString();
+        try {
+            restTemplate.postForEntity(url, person, String.class);
+        } catch (org.springframework.web.client.HttpStatusCodeException e) {
+            throw new Exception(e.getResponseBodyAsString());
+        } catch (Exception e) {
+            throw new Exception("Connection error: " + e.getMessage());
+        }
+    }
+
     // 3. Get Parking Lot Status
     public ParkingLot getStatus() {
         // Use exchange instead of getForObject to send headers

@@ -28,7 +28,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Disable for APIs
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/health", "/api/info", "/api/accounts/login").permitAll() // Public
+                        .requestMatchers("/health", "/api/info", "/api/accounts/login", "/api/accounts/register").permitAll() // Public
                         .anyRequest().authenticated() // Everything else locked
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

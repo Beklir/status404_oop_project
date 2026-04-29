@@ -8,6 +8,7 @@ import parkinglot.managers.JwtService;
 import parkinglot.users.Account;
 import parkinglot.users.ParkingAttendant;
 import parkinglot.server.repository.AccountRepository;
+import parkinglot.users.Person;
 import parkinglot.utils.LoginResponse;
 
 import java.util.List;
@@ -51,6 +52,17 @@ public class AccountController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error creating account: " + e.getMessage());
         }
+    }
+
+    @PostMapping("/update-person")
+    public ResponseEntity<String> updatePerson(@RequestParam String username, @RequestBody Person person) {
+        return accountRepo.findById(username)
+                .map(acc -> {
+                    acc.setPerson(person);
+                    accountRepo.save(acc);
+                    return ResponseEntity.ok("Person details updated successfully");
+                })
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found"));
     }
 
     // 3. List all accounts (For Admin Dashboard)
